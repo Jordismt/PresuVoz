@@ -37,11 +37,13 @@ const startDrawing = (e) => {
 }
 const stopDrawing = () => {
   drawing = false
-  const ctx = canvasRef.value.getContext('2d')
-  ctx.beginPath()
+  if (canvasRef.value) {
+    const ctx = canvasRef.value.getContext('2d')
+    ctx.beginPath()
+  }
 }
 const draw = (e) => {
-  if (!drawing) return
+  if (!drawing || !canvasRef.value) return
   const canvas = canvasRef.value
   const ctx = canvas.getContext('2d')
   const rect = canvas.getBoundingClientRect()
@@ -54,7 +56,7 @@ const draw = (e) => {
 
   ctx.lineWidth = 2
   ctx.lineCap = 'round'
-  ctx.strokeStyle = '#4f46e5' // Indigo 600
+  ctx.strokeStyle = '#4f46e5'
 
   ctx.lineTo(x, y)
   ctx.stroke()
@@ -135,9 +137,12 @@ const formatCurrency = (v) => {
 
 // --- RECONOCIMIENTO DE VOZ ---
 let recognition = null
-onMounted(() => {
+
+const toggleGrabacion = () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-  if (SpeechRecognition) {
+  if (!SpeechRecognition) return alert("Navegador no compatible.")
+
+  if (!recognition) {
     recognition = new SpeechRecognition()
     recognition.lang = 'es-ES'
     recognition.continuous = true
@@ -153,10 +158,7 @@ onMounted(() => {
     }
     recognition.onend = () => { grabando.value = false }
   }
-})
 
-const toggleGrabacion = () => {
-  if (!recognition) return alert("Tu navegador no soporta reconocimiento de voz.")
   if (grabando.value) recognition.stop()
   else {
     transcripcion.value = ''; textoEnVivo.value = '';
@@ -170,6 +172,7 @@ const generarConIA = async () => {
   try {
     const data = await $fetch('/api/generar', { method: 'POST', body: { texto: transcripcion.value } })
     configEmpresa.value.id = Math.floor(10000 + Math.random() * 90000)
+    // Se asegura que los datos de la IA entren limpios
     presupuesto.value = { ...data, fecha: new Date().toLocaleDateString('es-ES') }
     guardarEnHistorial()
   } catch (e) {
@@ -226,7 +229,6 @@ const descargarPDF = () => {
 
   const finalY = doc.lastAutoTable.finalY + 15
   
-  // Firma Emisor (Derecha)
   const firmaX = 140
   doc.setFontSize(9).setFont('helvetica', 'bold').text('FIRMADO POR (EMISOR):', firmaX, finalY)
   if (canvasRef.value) {
@@ -236,7 +238,6 @@ const descargarPDF = () => {
     doc.setFontSize(7).setTextColor(150).text(configEmpresa.value.nombre, firmaX, finalY + 22)
   }
 
-  // Totales
   doc.setFontSize(10).setTextColor(textColor[0], textColor[1], textColor[2])
   doc.text('Subtotal:', 15, finalY + 5)
   doc.text(formatCurrency(calculos.value.subtotal), 50, finalY + 5)
@@ -256,7 +257,7 @@ const compartirWA = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-100 p-4 md:p-10 font-sans text-slate-800">
+  <div class="min-h-screen bg-slate-100 p-2 md:p-10 font-sans text-slate-800">
     <div class="max-w-5xl mx-auto">
       
       <nav class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6 bg-white p-6 rounded-[2rem] shadow-sm">
@@ -294,7 +295,7 @@ const compartirWA = () => {
       </div>
 
       <section class="mb-10">
-        <div class="bg-white rounded-[2.5rem] p-10 shadow-xl border border-white text-center">
+        <div class="bg-white rounded-[2.5rem] p-6 md:p-10 shadow-xl border border-white text-center">
           <button @click="toggleGrabacion" 
             :class="grabando ? 'bg-red-500 ring-8 ring-red-50' : 'bg-slate-900 hover:bg-indigo-600'"
             class="w-20 h-20 rounded-full flex items-center justify-center text-white transition-all duration-300 mx-auto mb-6 shadow-xl"
@@ -303,25 +304,25 @@ const compartirWA = () => {
           </button>
 
           <div class="max-w-2xl mx-auto min-h-[80px] flex items-center justify-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 p-6 transition-all" :class="{'border-indigo-300 bg-indigo-50/30': grabando}">
-            <p v-if="!transcripcion && !grabando" class="text-slate-400 italic">"Haz un presupuesto para María García de 3 reparaciones de fontanería a 50€ cada una..."</p>
+            <p v-if="!transcripcion && !grabando" class="text-slate-400 italic text-sm md:text-base">"Haz un presupuesto para María García de 3 reparaciones de fontanería a 50€ cada una..."</p>
             <p v-else class="text-lg font-bold text-slate-800">{{ transcripcion }}<span class="text-indigo-400">{{ textoEnVivo }}</span></p>
           </div>
 
           <button v-if="transcripcion && !grabando" @click="generarConIA" :disabled="cargando"
-            class="mt-6 px-8 py-4 bg-indigo-600 text-white rounded-xl font-black shadow-lg hover:scale-105 transition-all disabled:opacity-50">
-            {{ cargando ? 'PROCESANDO...' : '🪄 GENERAR PRESUPUESTO' }}
+            class="mt-6 w-full md:w-auto px-8 py-4 bg-indigo-600 text-white rounded-xl font-black shadow-lg hover:scale-105 transition-all disabled:opacity-50">
+            {{ cargando ? 'PROCESANDO...' : '🪄 GENERAR' }}
           </button>
         </div>
       </section>
 
       <div v-if="presupuesto" class="bg-white shadow-2xl rounded-[2.5rem] overflow-hidden border border-slate-200 animate-fade-in mb-10">
-        <div class="p-8 md:p-14">
+        <div class="p-4 md:p-14">
           
-          <div class="flex flex-col md:flex-row justify-between mb-14 gap-10">
+          <div class="flex flex-col md:flex-row justify-between mb-8 md:mb-14 gap-10">
             <div class="flex-1 space-y-3">
               <div v-if="logoUrl" class="h-20 flex items-start mb-4"><img :src="logoUrl" class="max-h-full"></div>
               <div class="group relative">
-                <input v-model="configEmpresa.nombre" class="edit-field text-3xl font-black text-slate-900 uppercase w-full">
+                <input v-model="configEmpresa.nombre" class="edit-field text-2xl md:text-3xl font-black text-slate-900 uppercase w-full">
                 <span class="edit-icon">✎</span>
               </div>
               <div class="group relative">
@@ -333,8 +334,8 @@ const compartirWA = () => {
                 <span class="edit-icon">✎</span>
               </div>
             </div>
-            <div class="text-right">
-              <h2 class="text-5xl font-black text-indigo-600 italic tracking-tighter mb-2">PRESUPUESTO</h2>
+            <div class="text-left md:text-right">
+              <h2 class="text-4xl md:text-5xl font-black text-indigo-600 italic tracking-tighter mb-2">PRESUPUESTO</h2>
               <div class="bg-slate-900 text-white p-3 rounded-xl inline-block">
                 <p class="text-[9px] font-black uppercase">Referencia</p>
                 <p class="font-black text-lg">#{{ configEmpresa.id }}</p>
@@ -349,37 +350,38 @@ const compartirWA = () => {
             <span class="edit-icon">✎</span>
           </div>
 
-          <table class="w-full mb-6">
-            <thead>
-              <tr class="text-[10px] uppercase font-black text-slate-400 border-b-2 border-slate-100">
-                <th class="w-8"></th>
-                <th class="text-left pb-4">Descripción del Servicio</th>
-                <th class="text-center pb-4 w-20">Cant.</th>
-                <th class="text-right pb-4 w-28">Precio</th>
-                <th class="text-right pb-4 w-32">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-50">
-              <tr v-for="(item, idx) in presupuesto.items" :key="idx">
-                <td class="py-5"><button @click="borrarFila(idx)" class="text-red-200 hover:text-red-600 transition-colors">✕</button></td>
-                <td class="py-5"><input v-model="item.desc" class="edit-field font-bold text-slate-700 w-full"></td>
-                <td class="py-5"><input v-model.number="item.cant" type="number" class="w-full text-center font-black bg-slate-100 rounded-lg py-2"></td>
-                <td class="py-5 text-right"><input v-model.number="item.precio" type="number" class="w-full text-right font-bold bg-transparent outline-none"></td>
-                <td class="py-5 text-right font-black text-xl text-slate-900">{{ formatCurrency(item.cant * item.precio) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="overflow-x-auto">
+            <table class="w-full mb-6 min-w-[500px]">
+              <thead>
+                <tr class="text-[10px] uppercase font-black text-slate-400 border-b-2 border-slate-100">
+                  <th class="w-8"></th>
+                  <th class="text-left pb-4">Descripción</th>
+                  <th class="text-center pb-4 w-20">Cant.</th>
+                  <th class="text-right pb-4 w-28">Precio</th>
+                  <th class="text-right pb-4 w-32">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-50">
+                <tr v-for="(item, idx) in presupuesto.items" :key="idx">
+                  <td class="py-5"><button @click="borrarFila(idx)" class="text-red-200 hover:text-red-600 transition-colors">✕</button></td>
+                  <td class="py-5"><input v-model="item.desc" class="edit-field font-bold text-slate-700 w-full"></td>
+                  <td class="py-5"><input v-model.number="item.cant" type="number" class="w-full text-center font-black bg-slate-100 rounded-lg py-2"></td>
+                  <td class="py-5 text-right"><input v-model.number="item.precio" type="number" step="0.01" class="w-full text-right font-bold bg-transparent outline-none"></td>
+                  <td class="py-5 text-right font-black text-xl text-slate-900">{{ formatCurrency(item.cant * item.precio) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           <button @click="añadirFila" class="mb-10 text-[10px] font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg hover:bg-indigo-600 hover:text-white transition-all">
-            + AÑADIR LÍNEA MANUAL
+            + AÑADIR LÍNEA
           </button>
 
           <div class="flex flex-col md:flex-row justify-between pt-10 border-t-8 border-slate-900 gap-12">
-            
             <div class="flex-1 space-y-6">
               <div class="max-w-xs">
                 <div class="flex justify-between items-center mb-3">
-                  <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Firma del Emisor / Sello</span>
+                  <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Firma Emisor</span>
                   <button @click="borrarFirma" class="text-[10px] font-bold text-red-500 hover:underline">REINICIAR</button>
                 </div>
                 <canvas ref="canvasRef" width="350" height="120" 
@@ -387,11 +389,10 @@ const compartirWA = () => {
                   @mousedown="startDrawing" @mousemove="draw" @mouseup="stopDrawing" @mouseleave="stopDrawing"
                   @touchstart.prevent="startDrawing" @touchmove.prevent="draw" @touchend.prevent="stopDrawing">
                 </canvas>
-                <p class="text-[9px] text-slate-400 mt-2 italic">Esta firma se estampará en el PDF final.</p>
               </div>
 
               <div>
-                <p class="text-[10px] font-black uppercase mb-2">Términos y Condiciones</p>
+                <p class="text-[10px] font-black uppercase mb-2">Términos</p>
                 <textarea v-model="configEmpresa.notasLegales" class="edit-field text-[11px] text-slate-400 w-full h-24 bg-slate-50 p-4 rounded-xl resize-none"></textarea>
               </div>
             </div>
@@ -410,7 +411,7 @@ const compartirWA = () => {
                 <span>{{ formatCurrency(calculos.iva) }}</span>
               </div>
               <div class="pt-4 border-t-2 border-slate-100 text-right">
-                <span class="text-xs font-black text-indigo-600 block">TOTAL A PAGAR</span>
+                <span class="text-xs font-black text-indigo-600 block uppercase">Total</span>
                 <div class="text-5xl font-black text-slate-900 tracking-tighter">{{ formatCurrency(calculos.total) }}</div>
               </div>
             </div>
@@ -420,10 +421,10 @@ const compartirWA = () => {
 
       <div v-if="presupuesto" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
         <button @click="descargarPDF" class="flex items-center justify-center gap-3 py-6 bg-slate-900 text-white rounded-3xl font-black hover:bg-black transition-all shadow-xl">
-          <span class="text-2xl">📄</span> DESCARGAR PDF HD
+          📄 DESCARGAR PDF
         </button>
         <button @click="compartirWA" class="flex items-center justify-center gap-3 py-6 bg-[#25D366] text-white rounded-3xl font-black hover:scale-[1.02] transition-all shadow-xl">
-          <span class="text-2xl">💬</span> ENVIAR POR WHATSAPP
+          💬 WHATSAPP
         </button>
       </div>
 
@@ -438,9 +439,9 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   background-color: #f1f5f9;
+  touch-action: manipulation;
 }
 
-/* EFECTOS DE EDICIÓN INTUITIVA */
 .edit-field {
   background: transparent;
   border: 1px solid transparent;
@@ -452,7 +453,6 @@ body {
 
 .edit-field:hover {
   background: rgba(79, 70, 229, 0.04);
-  border-color: rgba(79, 70, 229, 0.1);
 }
 
 .edit-field:focus {
@@ -470,14 +470,12 @@ body {
   color: #4f46e5;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s;
 }
 
 .group:hover .edit-icon {
   opacity: 0.5;
 }
 
-/* ANIMACIONES */
 @keyframes slideIn {
   from { transform: translateX(-100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
@@ -492,5 +490,9 @@ body {
 
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   -webkit-appearance: none; margin: 0;
+}
+
+canvas {
+  touch-action: none;
 }
 </style>
