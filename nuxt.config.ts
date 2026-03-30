@@ -3,9 +3,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss'],
   runtimeConfig: {
-    // Dejamos un valor por defecto o vacío. 
-    // Nuxt lo sobrescribirá con lo que haya en el .env automáticamente.
-    groqKey: '' 
+    // IMPORTANTE: Estos nombres deben coincidir con lo que uses en el servidor
+    groqKey: '', // Se llena con la variable GROQ_KEY de Vercel
+    codigoLicencia: '' // Se llena con la variable CODIGO_LICENCIA de Vercel
   },
   app: {
     head: {
