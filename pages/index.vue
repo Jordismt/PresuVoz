@@ -3,6 +3,10 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
+// --- CONFIGURACIÓN DE SEGURIDAD ---
+// El código debe coincidir para usar la IA.
+const CODIGO_LICENCIA_VALIDO = import.meta.env.VITE_CODIGO_LICENCIA
+
 // --- ESTADOS DE LA APLICACIÓN ---
 const grabando = ref(false)
 const transcripcion = ref('')
@@ -20,7 +24,8 @@ const configEmpresa = ref({
   ivaPorcentaje: 21,
   notasLegales: '1. Los precios no incluyen retenciones adicionales.\n2. Presupuesto sujeto a disponibilidad de stock.\n3. Validez de la oferta: 30 días.',
   id: Math.floor(10000 + Math.random() * 90000),
-  fecha: new Date().toLocaleDateString('es-ES')
+  fecha: new Date().toLocaleDateString('es-ES'),
+  licenciaUsuario: '' 
 })
 
 // --- DATA DEL PRESUPUESTO Y HISTORIAL ---
@@ -47,17 +52,13 @@ const draw = (e) => {
   const canvas = canvasRef.value
   const ctx = canvas.getContext('2d')
   const rect = canvas.getBoundingClientRect()
-  
   const clientX = e.clientX || (e.touches && e.touches[0].clientX)
   const clientY = e.clientY || (e.touches && e.touches[0].clientY)
-  
   const x = clientX - rect.left
   const y = clientY - rect.top
-
   ctx.lineWidth = 2
   ctx.lineCap = 'round'
   ctx.strokeStyle = '#4f46e5'
-
   ctx.lineTo(x, y)
   ctx.stroke()
   ctx.beginPath()
@@ -117,13 +118,19 @@ const cargarDeHistorial = (item) => {
   borrarFirma()
 }
 
-// --- MOTOR DE CÁLCULOS ---
+// --- MOTOR DE CÁLCULOS (CORREGIDO PARA DESPLAZAMIENTOS Y KM) ---
 const calculos = computed(() => {
   if (!presupuesto.value) return { subtotal: 0, iva: 0, total: 0 }
+  
   const subtotal = presupuesto.value.items.reduce((acc, item) => {
-    return acc + ((Number(item.cant) || 0) * (Number(item.precio) || 0))
+    // Forzamos conversión a número para evitar errores de precisión o texto
+    const c = parseFloat(item.cant) || 0
+    const p = parseFloat(item.precio) || 0
+    return acc + (c * p)
   }, 0)
-  const iva = subtotal * (configEmpresa.value.ivaPorcentaje / 100)
+
+  const iva = subtotal * (parseFloat(configEmpresa.value.ivaPorcentaje || 0) / 100)
+  
   return {
     subtotal: subtotal.toFixed(2),
     iva: iva.toFixed(2),
@@ -167,12 +174,24 @@ const toggleGrabacion = () => {
 }
 
 const generarConIA = async () => {
+  // VALIDACIÓN DE LICENCIA PARA IA
+  if (configEmpresa.value.licenciaUsuario !== CODIGO_LICENCIA_VALIDO) {
+    return alert("⚠️ LICENCIA INVÁLIDA. Introduce el código en la configuración abajo.")
+  }
+
   if (!transcripcion.value) return
   cargando.value = true
   try {
-    const data = await $fetch('/api/generar', { method: 'POST', body: { texto: transcripcion.value } })
+    const response = await fetch('/api/generar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto: transcripcion.value })
+    })
+    
+    if (!response.ok) throw new Error("Error en la API")
+    const data = await response.json()
+    
     configEmpresa.value.id = Math.floor(10000 + Math.random() * 90000)
-    // Se asegura que los datos de la IA entren limpios
     presupuesto.value = { ...data, fecha: new Date().toLocaleDateString('es-ES') }
     guardarEnHistorial()
   } catch (e) {
@@ -304,7 +323,7 @@ const compartirWA = () => {
           </button>
 
           <div class="max-w-2xl mx-auto min-h-[80px] flex items-center justify-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 p-6 transition-all" :class="{'border-indigo-300 bg-indigo-50/30': grabando}">
-            <p v-if="!transcripcion && !grabando" class="text-slate-400 italic text-sm md:text-base">"Haz un presupuesto para María García de 3 reparaciones de fontanería a 50€ cada una..."</p>
+            <p v-if="!transcripcion && !grabando" class="text-slate-400 italic text-sm md:text-base">"Ej: 35 km de desplazamiento a 0.30€..."</p>
             <p v-else class="text-lg font-bold text-slate-800">{{ transcripcion }}<span class="text-indigo-400">{{ textoEnVivo }}</span></p>
           </div>
 
@@ -323,15 +342,12 @@ const compartirWA = () => {
               <div v-if="logoUrl" class="h-20 flex items-start mb-4"><img :src="logoUrl" class="max-h-full"></div>
               <div class="group relative">
                 <input v-model="configEmpresa.nombre" class="edit-field text-2xl md:text-3xl font-black text-slate-900 uppercase w-full">
-                <span class="edit-icon">✎</span>
               </div>
               <div class="group relative">
                 <input v-model="configEmpresa.nif" class="edit-field text-sm font-bold text-slate-400 w-full">
-                <span class="edit-icon">✎</span>
               </div>
               <div class="group relative">
                 <input v-model="configEmpresa.direccion" class="edit-field text-sm text-slate-400 w-full">
-                <span class="edit-icon">✎</span>
               </div>
             </div>
             <div class="text-left md:text-right">
@@ -347,7 +363,6 @@ const compartirWA = () => {
           <div class="mb-10 bg-indigo-50 p-6 rounded-2xl border-l-8 border-indigo-600 group relative">
             <span class="text-[10px] font-black text-indigo-600 uppercase block mb-1">CLIENTE DESTINATARIO</span>
             <input v-model="presupuesto.cliente" class="edit-field text-2xl font-black w-full bg-transparent">
-            <span class="edit-icon">✎</span>
           </div>
 
           <div class="overflow-x-auto">
@@ -365,8 +380,8 @@ const compartirWA = () => {
                 <tr v-for="(item, idx) in presupuesto.items" :key="idx">
                   <td class="py-5"><button @click="borrarFila(idx)" class="text-red-200 hover:text-red-600 transition-colors">✕</button></td>
                   <td class="py-5"><input v-model="item.desc" class="edit-field font-bold text-slate-700 w-full"></td>
-                  <td class="py-5"><input v-model.number="item.cant" type="number" class="w-full text-center font-black bg-slate-100 rounded-lg py-2"></td>
-                  <td class="py-5 text-right"><input v-model.number="item.precio" type="number" step="0.01" class="w-full text-right font-bold bg-transparent outline-none"></td>
+                  <td class="py-5"><input v-model.number="item.cant" type="number" step="any" class="w-full text-center font-black bg-slate-100 rounded-lg py-2"></td>
+                  <td class="py-5 text-right"><input v-model.number="item.precio" type="number" step="0.001" class="w-full text-right font-bold bg-transparent outline-none"></td>
                   <td class="py-5 text-right font-black text-xl text-slate-900">{{ formatCurrency(item.cant * item.precio) }}</td>
                 </tr>
               </tbody>
@@ -391,9 +406,16 @@ const compartirWA = () => {
                 </canvas>
               </div>
 
-              <div>
-                <p class="text-[10px] font-black uppercase mb-2">Términos</p>
-                <textarea v-model="configEmpresa.notasLegales" class="edit-field text-[11px] text-slate-400 w-full h-24 bg-slate-50 p-4 rounded-xl resize-none"></textarea>
+              <div class="grid grid-cols-1 gap-4">
+                <div>
+                  <p class="text-[10px] font-black uppercase mb-2">Términos</p>
+                  <textarea v-model="configEmpresa.notasLegales" class="edit-field text-[11px] text-slate-400 w-full h-24 bg-slate-50 p-4 rounded-xl resize-none"></textarea>
+                </div>
+                
+                <div class="bg-indigo-900 p-4 rounded-2xl text-white">
+                  <p class="text-[9px] font-black uppercase mb-2 text-indigo-300">🔑 ACTIVACIÓN LICENCIA PRO (NECESARIO PARA IA)</p>
+                  <input v-model="configEmpresa.licenciaUsuario" placeholder="CONTACTA AL ADMIN" class="w-full bg-indigo-800 border-none rounded-lg p-2 text-sm text-white placeholder-indigo-400 font-mono">
+                </div>
               </div>
             </div>
 
@@ -451,29 +473,11 @@ body {
   border-radius: 8px;
 }
 
-.edit-field:hover {
-  background: rgba(79, 70, 229, 0.04);
-}
-
+.edit-field:hover { background: rgba(79, 70, 229, 0.04); }
 .edit-field:focus {
   background: white;
   border-color: #4f46e5;
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
-}
-
-.edit-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 14px;
-  color: #4f46e5;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.group:hover .edit-icon {
-  opacity: 0.5;
 }
 
 @keyframes slideIn {
@@ -492,7 +496,5 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   -webkit-appearance: none; margin: 0;
 }
 
-canvas {
-  touch-action: none;
-}
+canvas { touch-action: none; }
 </style>
