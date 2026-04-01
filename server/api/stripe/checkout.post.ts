@@ -42,6 +42,7 @@ export default defineEventHandler(async (event) => {
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       line_items: [{ price: priceId, quantity: 1 }],
       mode: mode,
+      allow_promotion_codes: true,
       success_url: `${process.env.PUBLIC_BASE_URL || 'http://localhost:3000'}/?success=true`,
       cancel_url: `${process.env.PUBLIC_BASE_URL || 'http://localhost:3000'}/?canceled=true`,
       metadata: { 
