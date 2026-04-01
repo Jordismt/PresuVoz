@@ -6,8 +6,8 @@ import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
 
 // --- CONFIGURACIÓN DE STRIPE ---
-const PRICE_ID_UNICO = 'prod_UFskLkJtAw1ZB9'
-const PRICE_ID_PRO = 'prod_UFsjOm8s4fSkQ8'
+const PRICE_ID_UNICO = 'price_1THMyXBzDH5mgeinAIX7sJTB'
+const PRICE_ID_PRO = 'price_1THMyTBzDH5mgeinSoxEVvay'
 
 const { user, loadingUser } = useUser()
 const email = ref('')
