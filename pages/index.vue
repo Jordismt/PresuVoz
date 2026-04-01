@@ -195,8 +195,11 @@ const seleccionarHistorial = (p: any) => {
 const eliminarFila = (i: number) => presupuesto.value?.items.splice(i, 1)
 const añadirFila = () => presupuesto.value?.items.push({ desc: 'Nuevo concepto', cant: 1, precio: 0 })
 
-const descargarPDF = () => {
-  if (!presupuesto.value) return
+// --- LÓGICA DE GENERACIÓN DE PDF (UNIFICADA) ---
+
+// Esta función solo se encarga del diseño y los datos
+const prepararPDF = () => {
+  if (!presupuesto.value) return null
   const doc = new jsPDF()
   const c = configEmpresa.value
   const p = presupuesto.value
@@ -218,8 +221,41 @@ const descargarPDF = () => {
   doc.text(`IVA (${c.ivaPorcentaje}%): ${formatCurrency(calculos.value.iva)}`, 140, finalY + 7)
   doc.setFontSize(14).setFont("helvetica", "bold").text(`TOTAL: ${formatCurrency(calculos.value.total)}`, 140, finalY + 16)
   
-  doc.save(`Presupuesto_${p.cliente}.pdf`)
+  return doc
 }
+
+// Esta función solo descarga
+const descargarPDF = () => {
+  const doc = prepararPDF()
+  if (doc) doc.save(`Presupuesto_${presupuesto.value?.cliente}.pdf`)
+}
+
+// Esta función abre el menú de compartir (WhatsApp, etc.)
+const compartirPDF = async () => {
+  const doc = prepararPDF()
+  if (!doc || !presupuesto.value) return
+
+  const pdfBlob = doc.output('blob')
+  const nombreArchivo = `Presupuesto_${presupuesto.value.cliente.replace(/\s+/g, '_')}.pdf`
+  const archivo = new File([pdfBlob], nombreArchivo, { type: 'application/pdf' })
+
+  if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+    try {
+      await navigator.share({
+        files: [archivo],
+        title: 'Presupuesto ' + presupuesto.value.cliente,
+        text: `Hola ${presupuesto.value.cliente}, te adjunto el presupuesto solicitado.`
+      })
+    } catch (err) {
+      // Si el usuario cancela, lo descargamos para que no se pierda el trabajo
+      doc.save(nombreArchivo)
+    }
+  } else {
+    doc.save(nombreArchivo)
+    alert("PDF descargado. En ordenadores, adjúntalo manualmente a WhatsApp.")
+  }
+}
+
 
 const iniciarPago = async (priceId: string, mode: 'payment' | 'subscription') => {
   // Solo bloqueamos si intenta suscribirse de nuevo al plan que ya tiene
@@ -659,7 +695,17 @@ const limpiarTodoElHistorial = async () => {
                 </div>
               </div>
 
-              <button @click="descargarPDF" class="w-full mt-12 bg-indigo-600 text-white p-6 rounded-3xl font-black text-lg shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all">📥 Descargar PDF</button>
+              <div class="flex flex-col md:flex-row gap-4 mt-12">
+  <button @click="descargarPDF" 
+    class="flex-1 bg-slate-100 text-slate-600 p-6 rounded-3xl font-black text-lg hover:bg-slate-200 transition-all flex items-center justify-center gap-3">
+    <span>📥</span> Descargar
+  </button>
+
+  <button @click="compartirPDF" 
+    class="flex-[2] bg-indigo-600 text-white p-6 rounded-3xl font-black text-lg shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+    <span>🚀</span> Generar y Enviar
+  </button>
+</div>
             </div>
           </div>
 
