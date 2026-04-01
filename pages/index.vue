@@ -7,7 +7,7 @@ import autoTable from "jspdf-autotable"
 
 // --- CONFIGURACIÓN DE STRIPE ---
 const PRICE_ID_UNICO = 'price_1THMyXBzDH5mgeinAIX7sJTB'
-const PRICE_ID_PRO = 'price_1THMyTBzDH5mgeinSoxEVvay'
+const PRICE_ID_PRO = 'price_1THS8rBzDH5mgeink9B7w4lQ'
 
 const { user, loadingUser } = useUser()
 const email = ref('')
@@ -625,9 +625,9 @@ const limpiarTodoElHistorial = async () => {
         <span class="font-bold" :class="profile?.plan?.toLowerCase() === 'pro' ? 'text-white/90' : 'text-indigo-900'">
           {{ profile?.plan?.toLowerCase() === 'pro' ? 'Suscripción PRO Activa' : 'Plan PRO Mensual' }}
         </span>
-        <span v-if="profile?.plan?.toLowerCase() !== 'pro'" class="text-[10px] text-indigo-400 block font-black uppercase">100 usos / mes</span>
+        <span v-if="profile?.plan?.toLowerCase() !== 'pro'" class="text-[10px] text-indigo-400 block font-black uppercase">30 usos / mes</span>
       </div>
-      <span v-if="profile?.plan?.toLowerCase() !== 'pro'" class="bg-indigo-600 text-white px-3 py-1 rounded-lg font-black text-xs">29,99€</span>
+      <span v-if="profile?.plan?.toLowerCase() !== 'pro'" class="bg-indigo-600 text-white px-3 py-1 rounded-lg font-black text-xs">9,99€</span>
       <span v-else class="text-white text-lg">⭐</span>
     </button>
   </div>

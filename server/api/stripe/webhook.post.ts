@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
   const resetearPlanPro = async (userId: string, customerId: string) => {
     await supabaseAdmin.from('profiles').update({
       plan: 'pro', // Guardamos en minúscula si así lo tienes en DB
-      requests_limit: 100,
+      requests_limit: 30,
       requests_used: 0, // <--- CLAVE: El usuario empieza el mes de cero
       stripe_customer_id: customerId,
       subscription_status: 'active'
