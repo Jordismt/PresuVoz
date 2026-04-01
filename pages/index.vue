@@ -6,8 +6,8 @@ import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
 
 // --- CONFIGURACIÓN DE STRIPE ---
-const PRICE_ID_UNICO = 'price_1TGpkzBzDH5mgein9vdNEqVp'
-const PRICE_ID_PRO = 'price_1TGplVBzDH5mgeinTN6gYnb6'
+const PRICE_ID_UNICO = 'prod_UFskLkJtAw1ZB9'
+const PRICE_ID_PRO = 'prod_UFsjOm8s4fSkQ8'
 
 const { user, loadingUser } = useUser()
 const email = ref('')
@@ -578,7 +578,7 @@ const limpiarTodoElHistorial = async () => {
         <span class="font-bold block">1 Crédito puntual</span>
         <span class="text-[10px] opacity-60 uppercase font-black">Uso inmediato</span>
       </div>
-      <span class="bg-white text-indigo-600 px-3 py-1 rounded-lg font-black text-xs">1,69€</span>
+      <span class="bg-white text-indigo-600 px-3 py-1 rounded-lg font-black text-xs">1,59€</span>
     </button>
 
     <button @click="iniciarPago(PRICE_ID_PRO, 'subscription')" 
