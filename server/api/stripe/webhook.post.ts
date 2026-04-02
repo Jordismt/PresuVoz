@@ -75,22 +75,7 @@ export default defineEventHandler(async (event) => {
       console.log(`🔄 Renovación mensual procesada para: ${profile.id}`)
     }
   }
-  // CASO 3: El usuario cancela la suscripción o falla el pago final
-if (stripeEvent.type === 'customer.subscription.deleted') {
-  const subscription = stripeEvent.data.object as any
-  const customerId = subscription.customer
 
-  await supabaseAdmin
-    .from('profiles')
-    .update({ 
-      plan: 'free', 
-      subscription_status: 'canceled',
-      requests_limit: 1 // O el límite que pongas por defecto a los free
-    })
-    .eq('stripe_customer_id', customerId)
-    
-  console.log(`❌ Suscripción cancelada para el cliente: ${customerId}`)
-}
 // --- DENTRO DE TU EVENT HANDLER ---
 
 // CASO 4: Cancelación inmediata o programada
