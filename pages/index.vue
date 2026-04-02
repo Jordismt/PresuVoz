@@ -348,98 +348,325 @@ const limpiarTodoElHistorial = async () => {
 
     <div v-else-if="!user">
       
-      <div v-if="mostrarLanding" class="min-h-screen bg-white pb-20">
-        <nav class="max-w-6xl mx-auto px-6 py-8 flex justify-between items-center">
-          <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-indigo-100">P</div>
-            <span class="text-xl font-black tracking-tighter uppercase italic">PresuVoz</span>
-          </div>
-          <button @click="mostrarLanding = false; esRegistro = false" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors">Iniciar Sesión</button>
-        </nav>
+<div v-if="mostrarLanding" class="min-h-screen bg-white selection:bg-indigo-600 selection:text-white text-slate-900 overflow-x-hidden antialiased">
+  
+  <component :is="'script'" type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "PresuVoz AI",
+      "operatingSystem": "Web",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "AggregateOffer",
+        "lowPrice": "0",
+        "priceCurrency": "EUR"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "1240"
+      }
+    }
+  </component>
 
-        <main class="max-w-6xl mx-auto px-6 pt-12 text-center">
-          <div class="inline-block bg-indigo-50 text-indigo-600 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest mb-6">
-            ✨ Nueva Era para Autónomos
-          </div>
-          <h1 class="text-5xl md:text-7xl font-black tracking-tighter mb-8 leading-[0.9]">
-            Tus presupuestos hechos <br>
-            <span class="text-indigo-600 italic">solo con tu voz o un simple texto.</span>
-          </h1>
-          <p class="max-w-2xl mx-auto text-lg text-slate-500 font-medium mb-12">
-            Deja de perder horas frente al ordenador. Dicta los trabajos, la IA organiza los precios y tú descargas el PDF en segundos.
-          </p>
-          
-          <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-            <button @click="mostrarLanding = false; esRegistro = true" class="px-10 py-5 bg-indigo-600 text-white rounded-[2rem] font-black text-xl shadow-2xl shadow-indigo-200 hover:scale-105 transition-all active:scale-95">
-              Probar ahora gratis
-            </button>
-            <p class="text-sm text-slate-400 font-bold italic">🎁 1 presupuesto de regalo</p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-32 text-left px-4">
-            <div class="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100">
-              <div class="text-3xl mb-4">🎙️</div>
-              <h3 class="font-black text-xl mb-2">Dictado Natural</h3>
-              <p class="text-slate-500 text-sm font-medium leading-relaxed">Habla como lo harías con un cliente. La IA entiende conceptos, cantidades y precios.</p>
-            </div>
-            <div class="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100">
-              <div class="text-3xl mb-4">✨</div>
-              <h3 class="font-black text-xl mb-2">Inteligencia Real</h3>
-              <p class="text-slate-500 text-sm font-medium leading-relaxed">Calcula IVA automáticamente, organiza partidas y da formato profesional.</p>
-            </div>
-            <div class="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100">
-              <div class="text-3xl mb-4">📄</div>
-              <h3 class="font-black text-xl mb-2">PDF al Instante</h3>
-              <p class="text-slate-500 text-sm font-medium leading-relaxed">Descarga documentos listos para enviar, con tus datos fiscales y diseño limpio.</p>
-            </div>
-          </div>
-          <footer class="max-w-6xl mx-auto px-6 mt-32 pb-12 border-t border-slate-100 pt-16">
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-    <div class="col-span-1 md:col-span-2">
-      <div class="flex items-center gap-2 mb-6">
-        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black italic text-sm">P</div>
-        <span class="text-lg font-black tracking-tighter uppercase italic text-slate-800">PresuVoz</span>
+  <nav class="fixed top-0 z-[100] w-full bg-white/80 backdrop-blur-xl border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex justify-between items-center">
+      <div class="flex items-center gap-2 sm:gap-3 group cursor-pointer" @click="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-black rounded-xl flex items-center justify-center text-white font-black italic shadow-2xl group-hover:bg-indigo-600 transition-all duration-500 text-sm sm:text-base">P</div>
+        <span class="text-xl sm:text-2xl font-black tracking-tighter uppercase italic">PresuVoz</span>
       </div>
-      <p class="text-slate-500 text-sm font-medium leading-relaxed max-w-sm">
-        La herramienta inteligente para autónomos y pequeñas empresas que quieren profesionalizar su facturación sin perder tiempo.
+      <div class="flex items-center gap-3 sm:gap-8">
+        <button @click="mostrarLanding = false; esRegistro = false" class="hidden sm:block text-sm font-bold text-slate-500 hover:text-black transition-colors">Entrar</button>
+        <button @click="mostrarLanding = false; esRegistro = true" class="px-4 sm:px-8 py-2.5 sm:py-3 bg-black text-white rounded-full text-xs sm:text-sm font-black hover:bg-indigo-600 transition-all shadow-xl active:scale-95">
+          Empezar Gratis
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="relative pt-32 sm:pt-48 pb-20 sm:pb-32 overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-50 via-white to-white">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-30">
+      <div class="absolute top-0 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-indigo-300 rounded-full blur-[80px] sm:blur-[120px]"></div>
+      <div class="absolute bottom-0 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-violet-300 rounded-full blur-[80px] sm:blur-[120px]"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 text-center relative z-10">
+      <div class="inline-flex items-center gap-3 bg-white border border-slate-200 p-1 pr-4 rounded-full mb-8 sm:mb-12 shadow-sm">
+        <span class="bg-indigo-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-tighter">Dual Input</span>
+        <span class="text-[9px] sm:text-[11px] font-bold text-slate-600 uppercase tracking-[0.1em] sm:tracking-[0.2em]">Dicta o Escribe. La IA genera el PDF.</span>
+      </div>
+      
+<h1 class="text-4xl sm:text-6xl md:text-[90px] lg:text-[100px] font-black tracking-[-0.05em] mb-8 sm:mb-10 leading-[0.9] sm:leading-[0.85] text-slate-900 text-balance">
+  Crea tus <span class="text-indigo-600">presupuestos con IA</span> <br class="hidden sm:block">
+  <span class="italic font-serif opacity-90">dictando o escribiendo.</span>
+</h1>
+
+<p class="max-w-3xl mx-auto text-lg sm:text-xl md:text-2xl text-slate-500 font-medium mb-12 sm:mb-16 leading-relaxed text-balance px-4">
+  La herramienta definitiva para **autónomos de reformas, fontanería y electricidad**. 
+  Dicta tus notas mientras conduces o escribe un borrador rápido; PresuVoz genera un 
+  **PDF profesional desglosado en 30 segundos** listo para enviar por WhatsApp.
+</p>
+      
+      <div class="flex flex-col items-center gap-8 sm:gap-10">
+        <button @click="mostrarLanding = false; esRegistro = true" class="group relative w-full sm:w-auto px-8 sm:px-16 py-6 sm:py-8 bg-black text-white rounded-2xl sm:rounded-3xl font-black text-xl sm:text-2xl shadow-2xl hover:bg-indigo-600 transition-all active:scale-95 overflow-hidden">
+          <span class="relative z-10">Empezar PresuVoz Gratis 🚀</span>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+        </button>
+        
+        <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+          <div class="flex -space-x-3">
+             <img v-for="i in 4" :key="i" :src="`https://i.pravatar.cc/100?img=${i+30}`" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-white shadow-lg" />
+          </div>
+          <div class="text-center sm:text-left">
+            <p class="text-sm font-black text-slate-900">+1.200 autónomos</p>
+            <p class="text-xs font-bold text-slate-400 italic">Ahorran 15 horas de oficina al mes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto mt-20 sm:mt-32 px-4 sm:px-6 relative">
+      <div class="absolute -top-10 sm:-top-20 left-1/2 -translate-x-1/2 w-[110%] h-[300px] sm:h-[500px] bg-indigo-600/5 blur-[60px] sm:blur-[120px] rounded-full -z-10"></div>
+      <div class="bg-slate-900 rounded-[2.5rem] sm:rounded-[4rem] p-2 sm:p-4 shadow-2xl border border-slate-800 relative">
+        
+        <div class="absolute -top-8 -left-8 bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 hidden lg:block">
+           <div class="flex items-center gap-3">
+              <div class="text-4xl">🎙️</div>
+              <div class="text-4xl text-slate-200">/</div>
+              <div class="text-4xl">✍️</div>
+           </div>
+           <p class="mt-3 text-[10px] font-black uppercase text-indigo-600 tracking-widest text-center">Tú eliges cómo</p>
+        </div>
+
+        <div class="bg-white rounded-[2rem] sm:rounded-[3rem] overflow-hidden border border-slate-200 flex flex-col lg:flex-row min-h-[500px] sm:min-h-[600px]">
+          <aside class="w-full lg:w-[350px] bg-slate-50 border-b lg:border-b-0 lg:border-r border-slate-100 p-8 sm:p-10 space-y-8 sm:space-y-10 text-left">
+            <div>
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Paso 1: Tu borrador</span>
+              <h4 class="text-xl font-black text-slate-900 mt-2 italic leading-tight">Escribe o Dicta <br class="hidden sm:block">de forma natural</h4>
+            </div>
+
+            <div class="space-y-4">
+               <div class="p-5 bg-white rounded-2xl border-2 border-dashed border-indigo-100 italic text-slate-400 text-[11px] sm:text-xs">
+                  "Ej: Caldera Junkers 800€, Mano de obra 4h a 35€/h..."
+               </div>
+               <p class="text-center text-[10px] font-bold text-slate-400 uppercase">O simplemente hablas</p>
+               <div class="w-full h-16 sm:h-20 bg-indigo-600 rounded-2xl sm:rounded-3xl flex items-center justify-center text-white text-2xl sm:text-3xl shadow-lg shadow-indigo-100 cursor-pointer">
+                  🎙️
+               </div>
+               <p class="text-[9px] text-center text-indigo-400 font-bold uppercase tracking-widest animate-pulse">Púlsalo y describe el trabajo</p>
+            </div>
+          </aside>
+
+          <main class="flex-1 p-6 sm:p-10 md:p-16 text-left relative bg-white">
+            <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-10 sm:mb-16">
+              <div>
+                <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Paso 2: Resultado IA</span>
+                <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tighter">Presupuesto #2026-88</h3>
+              </div>
+              <div class="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-wider">PDF generado</div>
+            </div>
+            
+            <div class="space-y-6 sm:space-y-8 overflow-x-auto">
+              <div class="min-w-[400px]">
+                <div class="grid grid-cols-4 border-b border-slate-100 pb-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                  <div class="col-span-2">Concepto</div>
+                  <div class="text-center">Cant.</div>
+                  <div class="text-right">Total</div>
+                </div>
+                <div class="grid grid-cols-4 font-bold text-slate-800 border-b border-slate-50 py-4 sm:py-6 items-center text-sm sm:text-base">
+                  <div class="col-span-2">Caldera Junkers Eurosmart</div>
+                  <div class="text-center text-slate-400 font-medium">1 ud</div>
+                  <div class="text-right font-black italic">800,00€</div>
+                </div>
+                <div class="grid grid-cols-4 font-bold text-slate-800 border-b border-slate-50 py-4 sm:py-6 items-center text-sm sm:text-base">
+                  <div class="col-span-2">Mano de obra especializada</div>
+                  <div class="text-center text-slate-400 font-medium">4h</div>
+                  <div class="text-right font-black italic">140,00€</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-12 sm:mt-20 flex justify-end">
+              <div class="text-right p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-100">
+                <p class="text-[9px] font-black text-slate-400 uppercase mb-1 sm:mb-2 tracking-widest">Total (IVA incl.)</p>
+                <p class="text-4xl sm:text-6xl font-black tracking-tighter text-indigo-600">1.137,40€</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="py-20 sm:py-32 bg-slate-900 text-white overflow-hidden relative">
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+        <div>
+          <h2 class="text-4xl sm:text-5xl font-black tracking-tighter mb-8 sm:mb-12 leading-none text-balance text-center lg:text-left">
+            Deja de ser un <br><span class="text-indigo-400 italic">esclavo del papel.</span>
+          </h2>
+          <div class="space-y-6 sm:space-y-8">
+            <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 p-6 rounded-3xl bg-white/5 border border-white/10">
+              <div class="text-3xl">📝</div>
+              <div>
+                <h4 class="font-black text-lg mb-1 italic">El método antiguo</h4>
+                <p class="text-slate-400 text-sm">Llegar a casa cansado, buscar el bloc, encender el PC y pelearte con Excel. 2 horas perdidas.</p>
+              </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 p-6 rounded-3xl bg-indigo-600/20 border border-indigo-500/30 shadow-2xl">
+              <div class="text-3xl">🎙️</div>
+              <div>
+                <h4 class="font-black text-lg mb-1 italic">El método PresuVoz</h4>
+                <p class="text-slate-100 text-sm font-medium">Acabas la obra, dictas 20 segundos y envías el PDF por WhatsApp. 0 minutos perdidos.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 sm:gap-4">
+          <div v-for="stat in [{n:'30s', t:'Creación'}, {n:'100%', t:'Precisión'}, {n:'+15h', t:'Tiempo libre'}, {n:'A+', t:'Imagen Pro'}]" :key="stat.t" class="p-6 sm:p-10 bg-white/5 border border-white/10 rounded-2xl sm:rounded-[2.5rem] text-center">
+            <p class="text-3xl sm:text-4xl font-black text-indigo-400 mb-1 sm:mb-2 tracking-tighter">{{stat.n}}</p>
+            <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500">{{stat.t}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 sm:py-40 bg-white">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <div class="mb-16 sm:mb-24">
+        <h2 class="text-xs sm:text-sm font-black text-indigo-600 uppercase tracking-[0.3em] sm:tracking-[0.4em] mb-4">Precios sin letra pequeña</h2>
+        <p class="text-4xl sm:text-6xl font-black tracking-tighter text-slate-900 leading-[1.1] sm:leading-none">Mismas funciones. <br>Diferente volumen.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 items-stretch max-w-4xl mx-auto">
+        <div class="p-8 sm:p-12 bg-white rounded-[2.5rem] sm:rounded-[3.5rem] border-2 border-slate-100 flex flex-col justify-between hover:border-indigo-600/20 hover:shadow-2xl transition-all duration-500 group relative">
+          <div class="text-left">
+            <span class="inline-block px-4 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest mb-6 sm:mb-8">Ocasional</span>
+            <h4 class="text-2xl sm:text-3xl font-black mb-2 italic">1 Crédito</h4>
+            <p class="text-slate-500 text-sm mb-8 sm:mb-10 leading-relaxed font-medium italic">"Solo necesito este presupuesto ahora mismo".</p>
+            
+            <div class="flex items-baseline gap-2 mb-10 sm:mb-12">
+              <span class="text-6xl sm:text-7xl font-black tracking-tighter text-slate-900">1,59€</span>
+              <span class="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest">/ total</span>
+            </div>
+
+            <ul class="space-y-4 mb-10 sm:mb-12 text-xs sm:text-[13px] font-bold text-slate-700">
+              <li class="flex items-center gap-3">
+                <div class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px]">✓</div>
+                Historial completo guardado
+              </li>
+              <li class="flex items-center gap-3">
+                <div class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px]">✓</div>
+                Envío directo por WhatsApp
+              </li>
+              <li class="flex items-center gap-3">
+                <div class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px]">✓</div>
+                PDF con tus datos fiscales
+              </li>
+            </ul>
+          </div>
+          <button @click="mostrarLanding = false; esRegistro = true" class="w-full py-5 sm:py-6 rounded-2xl sm:rounded-3xl bg-slate-50 text-slate-900 font-black hover:bg-black hover:text-white transition-all uppercase text-[10px] sm:text-xs tracking-widest border border-slate-200">Comprar 1 Crédito</button>
+        </div>
+
+        <div class="p-8 sm:p-12 bg-slate-900 rounded-[2.5rem] sm:rounded-[3.5rem] text-white relative flex flex-col justify-between shadow-2xl md:scale-105 z-10 overflow-hidden border border-indigo-500/30">
+          <div class="absolute top-0 right-0 bg-indigo-600 px-6 sm:px-8 py-2 sm:py-3 rounded-bl-2xl sm:rounded-bl-[2rem] text-[9px] sm:text-[11px] font-black uppercase tracking-widest shadow-2xl animate-pulse">
+            Ahorras 37€ al mes
+          </div>
+          
+          <div class="text-left">
+            <span class="inline-block px-4 py-1 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-6 sm:mb-8">Profesional</span>
+            <h4 class="text-3xl sm:text-4xl font-black mb-2 italic">30 Créditos</h4>
+            <p class="text-slate-400 text-sm mb-8 sm:mb-10 leading-relaxed font-medium italic">Para los que no paran de cerrar obras.</p>
+            
+            <div class="flex items-baseline gap-2 mb-10 sm:mb-12">
+              <span class="text-7xl sm:text-8xl font-black tracking-tighter text-white">9,99€</span>
+              <span class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-widest">/ mes</span>
+            </div>
+
+            <ul class="space-y-4 mb-10 sm:mb-12 text-xs sm:text-[13px] font-bold">
+              <li class="flex items-center gap-3">
+                <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white text-[10px]">★</div>
+                Cada presupuesto a <span class="text-indigo-400 italic">0,33€</span>
+              </li>
+              <li class="flex items-center gap-3 text-indigo-100">
+                <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white text-[10px]">★</div>
+                Renovación automática
+              </li>
+              <li class="flex items-center gap-3">
+                <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white text-[10px]">★</div>
+                Incluye todas las funciones Pro
+              </li>
+            </ul>
+          </div>
+          
+          <button @click="mostrarLanding = false; esRegistro = true" class="w-full py-6 sm:py-7 rounded-2xl sm:rounded-3xl bg-indigo-600 text-white font-black hover:bg-indigo-500 transition-all uppercase text-[10px] sm:text-xs tracking-widest shadow-xl active:scale-95">
+            Activar Plan Mensual
+          </button>
+        </div>
+      </div>
+      
+      <div class="mt-16 sm:mt-20 inline-flex items-center gap-3 sm:gap-4 px-5 py-2.5 bg-slate-50 rounded-2xl border border-slate-100">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" class="h-3.5 sm:h-4 opacity-40" alt="Stripe">
+        <span class="h-4 w-[1px] bg-slate-200"></span>
+        <p class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Pago seguro por Stripe</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 sm:py-32 bg-slate-50 border-t border-slate-100">
+    <div class="max-w-4xl mx-auto px-6">
+      <h2 class="text-3xl sm:text-4xl font-black text-center mb-12 sm:mb-20 tracking-tighter">Lo que todos preguntan</h2>
+      <div class="space-y-4 sm:space-y-6">
+        <div v-for="faq in [
+          {q:'¿Entiende catalán o acentos?', a:'Nuestra IA entiende perfectamente el castellano, catalán y diversos acentos regionales sin problemas.'},
+          {q:'¿Puedo cancelar la suscripción?', a:'Sí, en cualquier momento con un solo clic desde tu panel. Sin permanencias.'},
+          {q:'¿Cómo recibo los presupuestos?', a:'Se generan en PDF profesional. Puedes enviarlos por WhatsApp, Email o descargarlos al instante.'}
+        ]" :key="faq.q" class="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-200">
+          <h4 class="font-black text-base sm:text-lg mb-2 sm:mb-3 tracking-tight italic">{{faq.q}}</h4>
+          <p class="text-slate-500 text-xs sm:text-sm font-medium leading-relaxed">{{faq.a}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-white pt-20 sm:pt-32 pb-12 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-20 text-balance">
+      <div class="col-span-1 lg:col-span-2 text-center sm:text-left">
+        <div class="flex items-center justify-center sm:justify-start gap-3 mb-6 sm:mb-8">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 bg-black rounded-xl flex items-center justify-center text-white font-black italic">P</div>
+          <span class="text-xl sm:text-2xl font-black tracking-tighter italic uppercase">PresuVoz</span>
+        </div>
+        <p class="text-slate-400 font-bold max-w-sm text-base sm:text-lg leading-tight uppercase italic opacity-50 mx-auto sm:mx-0">
+          Dedicado a los que construyen el mañana con sus propias manos.
+        </p>
+      </div>
+      <div class="text-center sm:text-left">
+        <h5 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-6 sm:mb-8">Soporte Directo</h5>
+        <a href="mailto:jcasoldev@gmail.com" class="text-indigo-600 font-black text-sm block hover:underline">jcasoldev@gmail.com</a>
+        <p class="text-slate-400 text-[10px] font-black uppercase mt-2 tracking-widest">España 🇪🇸</p>
+      </div>
+      <div class="text-center sm:text-left">
+        <h5 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-6 sm:mb-8">Legal</h5>
+        <ul class="space-y-3 sm:space-y-4 font-bold text-slate-500 text-[11px] uppercase tracking-widest">
+          <li><NuxtLink to="/legal/privacidad" class="hover:text-black">Privacidad</NuxtLink></li>
+          <li><NuxtLink to="/legal/terminos" class="hover:text-black">Términos</NuxtLink></li>
+          <li><NuxtLink to="/legal/aviso-legal" class="hover:text-black">Aviso Legal</NuxtLink></li>
+        </ul>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 pt-12 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-8">
+      <div class="flex items-center gap-6 opacity-30 grayscale">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" class="h-4 sm:h-5" alt="Stripe">
+      </div>
+      <p class="text-[9px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] sm:tracking-[0.4em] text-center">
+        © 2026 PresuVoz AI • Built for makers.
       </p>
     </div>
+  </footer>
+</div>
 
-    <div>
-      <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Legal</h4>
-<ul class="space-y-4">
-  <li><NuxtLink to="/legal/aviso-legal" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors">Aviso Legal</NuxtLink></li>
-  <li><NuxtLink to="/legal/privacidad" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors">Privacidad</NuxtLink></li>
-  <li><NuxtLink to="/legal/terminos" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors">Términos de Uso</NuxtLink></li>
-</ul>
-    </div>
-
-    <div>
-      <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Soporte</h4>
-      <ul class="space-y-4">
-        <li class="flex items-center gap-3">
-          <span class="text-lg">📧</span>
-          <a href="mailto:jcasoldev@gmail.com" class="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors">jcasoldev@gmail.com</a>
-        </li>
-        <li class="flex items-center gap-3">
-          <span class="text-lg">📍</span>
-          <span class="text-sm font-bold text-slate-600">España</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-slate-50">
-    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-      © 2026 PresuVoz AI. Todos los derechos reservados.
-    </p>
-    <div class="flex gap-6">
-      <span class="text-[10px] font-black text-slate-300 uppercase tracking-tighter">Pagos seguros vía Stripe 💳</span>
-    </div>
-  </div>
-</footer>
-        </main>
-      </div>
 
       <div v-else class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-indigo-50 via-white to-slate-100 relative">
         <button @click="mostrarLanding = true" class="absolute top-8 left-8 text-slate-400 hover:text-indigo-600 font-bold flex items-center gap-2 transition-colors">

@@ -3,12 +3,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss'],
   runtimeConfig: {
-    // Variables privadas (solo servidor)
     groqKey: process.env.GROQ_KEY,
     supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    
-
-    // Variables públicas (accesibles en el frontend)
     public: {
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
       supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY
@@ -16,10 +12,33 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'PresuVoz Enterprise - IA Sales Assistant',
+      htmlAttrs: {
+        lang: 'es' // 1. Indica a Google que tu web es para público español
+      },
+      title: 'PresuVoz | Genera Presupuestos en 30 Segundos (Voz o Texto) 🎙️',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0' },
-        { name: 'theme-color', content: '#2563eb' }
+        { charset: 'utf-8' },
+        
+        // SEO Estándar
+        { name: 'description', content: 'La herramienta definitiva para autónomos. Dicta tus trabajos y genera presupuestos en PDF al instante con IA. ¡Ahorra horas de oficina!' },
+        { name: 'keywords', content: 'presupuestos voz, app autónomos, facturación ia, presupuestos rápidos, fontaneros, electricistas, reformas' },
+        { name: 'author', content: 'PresuVoz AI' },
+
+        // Open Graph / Facebook (Para que el link se vea pro en WhatsApp)
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: 'PresuVoz - El fin de los presupuestos manuales' },
+        { property: 'og:description', content: 'Dicta, genera y envía. La IA que entiende a los profesionales de las reformas y servicios.' },
+        { property: 'og:image', content: '/og-image.jpg' }, // Asegúrate de subir una foto a la carpeta /public
+        { property: 'og:url', content: 'https://presuvoz.es' }, // Cambia por tu dominio real
+
+        // Twitter Card
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'PresuVoz | Presupuestos por Voz' },
+        { name: 'twitter:description', content: 'Crea PDFs profesionales en 30 segundos sin tocar el teclado.' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
       ]
     }
   }
