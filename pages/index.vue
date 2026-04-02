@@ -580,13 +580,13 @@ Para fontaneros, electricistas y reformistas que quieren responder más rápido 
 
         <div class="p-8 sm:p-12 bg-slate-900 rounded-[2.5rem] sm:rounded-[3.5rem] text-white relative flex flex-col justify-between shadow-2xl md:scale-105 z-10 overflow-hidden border border-indigo-500/30">
           <div class="absolute top-0 right-0 bg-indigo-600 px-6 sm:px-8 py-2 sm:py-3 rounded-bl-2xl sm:rounded-bl-[2rem] text-[9px] sm:text-[11px] font-black uppercase tracking-widest shadow-2xl animate-pulse">
-            Ahorras 37€ al mes
+            Ahorras 30€ al mes
           </div>
           
           <div class="text-left">
             <span class="inline-block px-4 py-1 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-6 sm:mb-8">Profesional</span>
-            <h4 class="text-3xl sm:text-4xl font-black mb-2 italic">30 Créditos</h4>
-            <p class="text-slate-400 text-sm mb-8 sm:mb-10 leading-relaxed font-medium italic">Para los que no paran de cerrar obras.</p>
+            <h4 class="text-3xl sm:text-4xl font-black mb-2 italic">25 Créditos</h4>
+            <p class="text-slate-400 text-sm mb-8 sm:mb-10 leading-relaxed font-medium italic">Para los que no paran de cerrar clientes.</p>
             
             <div class="flex items-baseline gap-2 mb-10 sm:mb-12">
               <span class="text-7xl sm:text-8xl font-black tracking-tighter text-white">9,99€</span>
@@ -596,7 +596,7 @@ Para fontaneros, electricistas y reformistas que quieren responder más rápido 
             <ul class="space-y-4 mb-10 sm:mb-12 text-xs sm:text-[13px] font-bold">
               <li class="flex items-center gap-3">
                 <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white text-[10px]">★</div>
-                Cada presupuesto a <span class="text-indigo-400 italic">0,33€</span>
+                Cada presupuesto a <span class="text-indigo-400 italic">0,40€</span>
               </li>
               <li class="flex items-center gap-3 text-indigo-100">
                 <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white text-[10px]">★</div>
