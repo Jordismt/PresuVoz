@@ -407,14 +407,13 @@ const limpiarTodoElHistorial = async () => {
       </div>
       
 <h1 class="text-4xl sm:text-6xl md:text-[90px] lg:text-[100px] font-black tracking-[-0.05em] mb-8 sm:mb-10 leading-[0.9] sm:leading-[0.85] text-slate-900 text-balance">
-  Crea tus <span class="text-indigo-600">presupuestos con IA</span> <br class="hidden sm:block">
-  <span class="italic font-serif opacity-90">dictando o escribiendo.</span>
+  Envia presupuestos <span class="text-indigo-600">en 30 segundos</span> <br class="hidden sm:block">
+  <span class="italic font-serif opacity-90">y consigue más clientes</span>
 </h1>
 
 <p class="max-w-3xl mx-auto text-lg sm:text-xl md:text-2xl text-slate-500 font-medium mb-12 sm:mb-16 leading-relaxed text-balance px-4">
-  La herramienta definitiva para **autónomos de reformas, fontanería y electricidad**. 
-  Dicta tus notas mientras conduces o escribe un borrador rápido; PresuVoz genera un 
-  **PDF profesional desglosado en 30 segundos** listo para enviar por WhatsApp.
+Para fontaneros, electricistas y reformistas que quieren responder más rápido y cerrar más trabajos. 
+  Habla o escribe y obtén un presupuesto profesional listo para enviar por WhatsApp en 30 segundos.
 </p>
       
       <div class="flex flex-col items-center gap-8 sm:gap-10">
@@ -428,7 +427,7 @@ const limpiarTodoElHistorial = async () => {
              <img v-for="i in 4" :key="i" :src="`https://i.pravatar.cc/100?img=${i+30}`" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-white shadow-lg" />
           </div>
           <div class="text-center sm:text-left">
-            <p class="text-sm font-black text-slate-900">+1.200 autónomos</p>
+            <p class="text-sm font-black text-slate-900">+100 autónomos</p>
             <p class="text-xs font-bold text-slate-400 italic">Ahorran 15 horas de oficina al mes</p>
           </div>
         </div>
