@@ -878,7 +878,7 @@ Para fontaneros, electricistas y reformistas que quieren responder más rápido 
         <span class="font-bold" :class="profile?.plan?.toLowerCase() === 'pro' ? 'text-white/90' : 'text-indigo-900'">
           {{ profile?.plan?.toLowerCase() === 'pro' ? 'Suscripción PRO Activa' : 'Plan PRO Mensual' }}
         </span>
-        <span v-if="profile?.plan?.toLowerCase() !== 'pro'" class="text-[10px] text-indigo-400 block font-black uppercase">30 usos / mes</span>
+        <span v-if="profile?.plan?.toLowerCase() !== 'pro'" class="text-[10px] text-indigo-400 block font-black uppercase">25 usos / mes</span>
       </div>
       <span v-if="profile?.plan?.toLowerCase() !== 'pro'" class="bg-indigo-600 text-white px-3 py-1 rounded-lg font-black text-xs">9,99€</span>
       <span v-else class="text-white text-lg">⭐</span>
