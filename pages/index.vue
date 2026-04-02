@@ -4,7 +4,7 @@ import { supabase } from '~/lib/supabase'
 import { useUser } from '~/composable/useUser'
 import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
-
+import { signInWithGoogle } from '~/lib/supabase'
 // --- CONFIGURACIÓN DE STRIPE ---
 const PRICE_ID_UNICO = 'price_1THMyXBzDH5mgeinAIX7sJTB'
 const PRICE_ID_PRO = 'price_1THS8rBzDH5mgeink9B7w4lQ'
@@ -39,7 +39,16 @@ const configEmpresa = ref({
   fecha: new Date().toLocaleDateString('es-ES')
 })
 
-
+const handleGoogleAuth = async () => {
+  cargandoAuth.value = true
+  try {
+    const { error } = await signInWithGoogle()
+    if (error) throw error
+  } catch (error: any) {
+    alert("Error al conectar con Google: " + error.message)
+    cargandoAuth.value = false
+  }
+}
 
 const fetchProfile = async () => {
   if (!user.value) return
@@ -717,6 +726,24 @@ const limpiarTodoElHistorial = async () => {
                 {{ esRegistro ? '¿Ya tienes cuenta? Inicia sesión aquí' : '¿No tienes cuenta? Crea una gratis' }}
               </button>
             </div>
+            <button 
+  type="button"
+  @click="handleGoogleAuth" 
+  :disabled="cargandoAuth"
+  class="w-full flex items-center justify-center gap-3 p-5 rounded-2xl bg-white border-2 border-slate-100 hover:border-indigo-600 hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm group"
+>
+  <img v-if="!cargandoAuth" src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6 group-hover:scale-110 transition-transform" alt="Google">
+  <span v-else class="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></span>
+  <span class="text-slate-700 font-bold tracking-tight">
+    {{ esRegistro ? 'Registrarse con Google' : 'Entrar con Google' }}
+  </span>
+</button>
+
+<div class="relative flex py-2 items-center">
+  <div class="flex-grow border-t border-slate-100"></div>
+  <span class="flex-shrink mx-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">o con tu email</span>
+  <div class="flex-grow border-t border-slate-100"></div>
+</div>
           </div>
         </div>
       </div>

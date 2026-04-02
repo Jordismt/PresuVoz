@@ -25,3 +25,18 @@ export const supabase = {
   // Si usas más funciones como .storage o .rpc, añádelas aquí:
   get storage() { return getSupabase().storage }
 }
+
+// En lib/auth.ts
+export const signInWithGoogle = async () => {
+  return supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      // Pon tu dominio directamente entre comillas
+      redirectTo: 'https://presuvoz.es', 
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'select_account',
+      },
+    },
+  })
+}
