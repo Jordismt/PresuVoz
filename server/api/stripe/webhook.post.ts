@@ -28,14 +28,28 @@ export default defineEventHandler(async (event) => {
   }
 
   // Función para SUSCRIPCIÓN PRO (Resetear a 100 y limpiar uso)
+// Función para SUSCRIPCIÓN PRO (Suma 25 créditos cada vez)
   const resetearPlanPro = async (userId: string, customerId: string) => {
+    // 1. Miramos qué límite tiene ahora mismo el usuario
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('requests_limit')
+      .eq('id', userId)
+      .single()
+
+    // 2. Sumamos 25 al límite actual (si no tiene nada, usamos 0)
+    const limiteActual = profile?.requests_limit || 0
+    const nuevoLimite = limiteActual + 25
+
+    // 3. Actualizamos: el plan pasa a ser 'pro', subimos el límite y NO tocamos el uso
     await supabaseAdmin.from('profiles').update({
-      plan: 'pro', // Guardamos en minúscula si así lo tienes en DB
-      requests_limit: 25,
-      requests_used: 0, // <--- CLAVE: El usuario empieza el mes de cero
+      plan: 'pro',
+      requests_limit: nuevoLimite,
       stripe_customer_id: customerId,
       subscription_status: 'active'
     }).eq('id', userId)
+
+    console.log(`✅ Créditos sumados. Nuevo límite para ${userId}: ${nuevoLimite}`)
   }
 
   // --- PROCESAR EVENTOS ---
