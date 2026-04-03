@@ -27,3 +27,13 @@
     </section>
   </div>
 </template>
+<script setup>
+useHead({
+  title: 'Política de Privacidad | PresuVoz',
+  meta: [
+    { name: 'description', content: 'Infórmate sobre cómo protegemos y gestionamos tus datos personales en PresuVoz.' },
+    // Mantenemos el noindex para que Google priorice tu Landing Page
+    { name: 'robots', content: 'noindex, follow' } 
+  ]
+})
+</script>

@@ -23,3 +23,13 @@
     </section>
   </div>
 </template>
+<script setup>
+useHead({
+  title: 'Términos y Condiciones | PresuVoz',
+  meta: [
+    { name: 'description', content: 'Consulta las condiciones de uso y servicio de PresuVoz.' },
+    // Esto le dice a Google: "Esta no es la página principal"
+    { name: 'robots', content: 'noindex, follow' } 
+  ]
+})
+</script>

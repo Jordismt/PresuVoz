@@ -21,3 +21,12 @@
     </section>
   </div>
 </template>
+<script setup>
+useHead({
+  title: 'Aviso Legal | PresuVoz',
+  meta: [
+    { name: 'description', content: 'Información legal, titularidad y condiciones de uso del sitio web PresuVoz.' },
+    { name: 'robots', content: 'noindex, follow' } 
+  ]
+})
+</script>
