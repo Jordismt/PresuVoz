@@ -255,10 +255,72 @@ useSeoMeta({
       </div>
     </section>
 
-    <footer class="relative z-10 py-12 text-center text-xs font-medium text-slate-600 border-t border-slate-900">
-      <p>&copy; 2026 PresuVoz AI. Todos los derechos reservados.</p>
-    </footer space-y-12>
+
   </main>
+  <footer class="bg-white pt-20 sm:pt-32 pb-12 border-t border-slate-100">
+  <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-20 text-balance">
+    
+    <div class="col-span-1 lg:col-span-2 text-center sm:text-left">
+      <div class="flex items-center justify-center sm:justify-start gap-3 mb-6 sm:mb-8">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-black rounded-xl flex items-center justify-center text-white font-black italic shadow-lg">P</div>
+        <span class="text-xl sm:text-2xl font-black tracking-tighter italic uppercase">PresuVoz</span>
+      </div>
+      <p class="text-slate-400 font-bold max-w-sm text-base sm:text-lg leading-tight uppercase italic opacity-50 mx-auto sm:mx-0">
+        Dedicado a los que construyen el mañana con sus propias manos.
+      </p>
+      <div class="mt-8 flex items-center justify-center sm:justify-start gap-2">
+        <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Sistema Operativo v3.1</span>
+      </div>
+    </div>
+
+    <div class="text-center sm:text-left">
+      <h5 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-6 sm:mb-8 italic">Oficios I</h5>
+      <ul class="space-y-3 sm:space-y-4 font-bold text-slate-500 text-[11px] uppercase tracking-widest">
+        <li><NuxtLink to="/oficios/pintores" class="hover:text-black transition-colors">Pintores</NuxtLink></li>
+        <li><NuxtLink to="/oficios/electricistas" class="hover:text-black transition-colors">Electricistas</NuxtLink></li>
+        <li><NuxtLink to="/oficios/fontaneros" class="hover:text-black transition-colors">Fontaneros</NuxtLink></li>
+        <li><NuxtLink to="/oficios/reformas-integrales" class="hover:text-black transition-colors">Reformas</NuxtLink></li>
+        <li><NuxtLink to="/oficios/limpieza" class="hover:text-black transition-colors">Limpieza</NuxtLink></li>
+        <li><NuxtLink to="/oficios/carpinteros" class="hover:text-black transition-colors">Carpinteros</NuxtLink></li>
+        <li><NuxtLink to="/oficios/climatizacion" class="hover:text-black transition-colors">Climatización</NuxtLink></li>
+      </ul>
+    </div>
+
+    <div class="text-center sm:text-left">
+      <h5 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-6 sm:mb-8 italic">Oficios II</h5>
+      <ul class="space-y-3 sm:space-y-4 font-bold text-slate-500 text-[11px] uppercase tracking-widest">
+        <li><NuxtLink to="/oficios/albaniles" class="hover:text-black transition-colors">Albañiles</NuxtLink></li>
+        <li><NuxtLink to="/oficios/jardineros" class="hover:text-black transition-colors">Jardineros</NuxtLink></li>
+        <li><NuxtLink to="/oficios/pladuristas" class="hover:text-black transition-colors">Pladuristas</NuxtLink></li>
+        <li><NuxtLink to="/oficios/cerrajeros" class="hover:text-black transition-colors">Cerrajeros</NuxtLink></li>
+        <li><NuxtLink to="/oficios/montadores-muebles" class="hover:text-black transition-colors">Montadores</NuxtLink></li>
+        <li><NuxtLink to="/oficios/tecnicos-electrodomesticos" class="hover:text-black transition-colors">Reparaciones</NuxtLink></li>
+      </ul>
+    </div>
+
+    <div class="text-center sm:text-left">
+      <h5 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-6 sm:mb-8 italic">Soporte & Legal</h5>
+      <ul class="space-y-3 sm:space-y-4 font-bold text-slate-500 text-[11px] uppercase tracking-widest mb-8">
+        <li><NuxtLink to="/legal/privacidad" class="hover:text-black">Privacidad</NuxtLink></li>
+        <li><NuxtLink to="/legal/terminos" class="hover:text-black">Términos</NuxtLink></li>
+        <li><NuxtLink to="/legal/aviso-legal" class="hover:text-black">Aviso Legal</NuxtLink></li>
+      </ul>
+      <a href="mailto:jcasoldev@gmail.com" class="text-indigo-600 font-black text-sm block hover:underline tracking-tighter uppercase italic">jcasoldev@gmail.com</a>
+      <p class="text-slate-400 text-[10px] font-black uppercase mt-2 tracking-widest">España 🇪🇸</p>
+    </div>
+
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 pt-12 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-8">
+    <div class="flex items-center gap-6 opacity-30 grayscale hover:opacity-100 hover:grayscale-0 transition-all">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" class="h-4 sm:h-5" alt="Stripe">
+    </div>
+    <p class="text-[9px] sm:text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] sm:tracking-[0.4em] text-center">
+      © 2026 PresuVoz AI • Built for makers.
+    </p>
+  </div>
+</footer>
 </template>
 
 <style>
