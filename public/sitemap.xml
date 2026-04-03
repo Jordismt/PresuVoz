@@ -5,9 +5,20 @@
     <lastmod>2026-04-03</lastmod>
     <priority>1.0</priority>
   </url>
+
   <url>
-    <loc>https://presuvoz.es/aviso-legal</loc>
+    <loc>https://presuvoz.es/legal/aviso-legal</loc>
     <lastmod>2026-04-03</lastmod>
-    <priority>0.3</priority>
+    <priority>0.2</priority>
+  </url>
+  <url>
+    <loc>https://presuvoz.es/legal/terminos</loc>
+    <lastmod>2026-04-03</lastmod>
+    <priority>0.2</priority>
+  </url>
+  <url>
+    <loc>https://presuvoz.es/legal/privacidad</loc>
+    <lastmod>2026-04-03</lastmod>
+    <priority>0.2</priority>
   </url>
 </urlset>
