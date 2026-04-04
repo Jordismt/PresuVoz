@@ -1215,9 +1215,7 @@ const limpiarTodoElHistorial = async () => {
                   stroke-width="2"
                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span class="hidden sm:block text-[11px] font-black uppercase tracking-widest text-slate-600"
-                >Perfil</span
-              >
+              <span class="text-[11px] font-black uppercase tracking-widest text-slate-600">Perfil</span>
             </button>
 
             <button
