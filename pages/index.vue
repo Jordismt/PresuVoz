@@ -1531,11 +1531,18 @@ const limpiarTodoElHistorial = async () => {
 
               <div
                 v-if="textoEnVivo"
-                class="absolute bottom-20 left-6 right-6 bg-white/90 backdrop-blur-sm p-3 rounded-2xl border border-indigo-100 shadow-sm animate-pulse pointer-events-none">
-                <p class="text-[11px] font-bold text-indigo-500 italic leading-tight">
-                  <span class="opacity-50 uppercase text-[9px] block mb-1">Escuchando...</span>
-                  "{{ textoEnVivo }}"
-                </p>
+                class="absolute bottom-20 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-[1.5rem] border border-indigo-100 shadow-xl shadow-indigo-50/50 animate-in fade-in zoom-in duration-300 pointer-events-none">
+                <div class="flex items-center gap-3">
+                  <span v-if="grabando" class="relative flex h-3 w-3">
+                    <span
+                      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                  </span>
+
+                  <p class="text-[12px] font-black text-indigo-600 italic tracking-tight leading-none">
+                    {{ textoEnVivo }}
+                  </p>
+                </div>
               </div>
 
               <div
