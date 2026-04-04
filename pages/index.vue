@@ -399,7 +399,17 @@ const toggleGrabacion = () => {
     toggleGrabacionSpeech();
   }
 };
-
+// Si usas Script Setup
+const vAutoResize = {
+  mounted: (el) => {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  },
+  updated: (el) => {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  },
+};
 const generarConIA = async () => {
   if (!transcripcion.value) return;
   cargandoIA.value = true;
@@ -1780,10 +1790,10 @@ const limpiarTodoElHistorial = async () => {
                   <thead>
                     <tr
                       class="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-100">
-                      <th class="pb-4 pl-2">Descripción</th>
-                      <th class="pb-4 text-center w-20">Cant.</th>
-                      <th class="pb-4 text-right w-32">Precio</th>
-                      <th class="pb-4 w-12"></th>
+                      <th class="pb-4 pl-2 w-full">Descripción</th>
+                      <th class="pb-4 text-center w-16">Cant.</th>
+                      <th class="pb-4 text-right w-24">Precio</th>
+                      <th class="pb-4 w-8"></th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-50">
@@ -1792,9 +1802,18 @@ const limpiarTodoElHistorial = async () => {
                       :key="i"
                       class="group hover:bg-slate-50/50 transition-colors">
                       <td class="py-5 pl-2 font-bold text-slate-700">
-                        <input
+                        <textarea
                           v-model="item.desc"
-                          class="w-full bg-transparent outline-none focus:text-indigo-600" />
+                          rows="1"
+                          class="w-full bg-transparent border-none p-0 focus:ring-0 resize-none overflow-hidden text-slate-700 font-bold leading-snug align-top"
+                          placeholder="Descripción del trabajo..."
+                          @input="
+                            (e) => {
+                              e.target.style.height = 'auto';
+                              e.target.style.height = e.target.scrollHeight + 'px';
+                            }
+                          "
+                          v-auto-resize></textarea>
                       </td>
                       <td class="py-5 text-center">
                         <input
