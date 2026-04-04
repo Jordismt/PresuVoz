@@ -136,32 +136,17 @@ const logout = async () => {
 const toggleGrabacion = () => {
   if (!process.client) return;
 
-  // 1. DETECCIÓN DE IPHONE / IPAD
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  const SpeechRecognition =
+    (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-  // 2. DETECCIÓN DE SI ES SAFARI REAL (Safari tiene 'Safari' en el agent pero NO 'Chrome' o 'CriOS')
-  // Chrome en iOS se identifica como 'CriOS'
-  const isSafariEfectivo =
-    isIOS &&
-    navigator.userAgent.indexOf("Safari") !== -1 &&
-    navigator.userAgent.indexOf("CriOS") === -1 &&
-    navigator.userAgent.indexOf("FxiOS") === -1; // Firefox iOS
-
-  // Si es iPhone pero NO es Safari, lanzamos el aviso y frenamos
-  if (isIOS && !isSafariEfectivo) {
+  // Si el navegador no soporta SpeechRecognition en absoluto, informamos
+  if (!SpeechRecognition) {
     return alert(
-      "⚠️ El dictado por voz tiene limitaciones en Chrome para iPhone.\n\nPor favor, abre PresuVoz en SAFARI o usa la opción 'Añadir a pantalla de inicio' para que funcione correctamente.",
+      "⚠️ Tu navegador no soporta dictado por voz.\n\nEn iPhone usa Safari. En Android usa Chrome."
     );
   }
 
-  // --- El resto de tu lógica original sigue aquí ---
   if (!recognition) {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      return alert("Navegador no compatible con dictado por voz.");
-    }
-
     recognition = new SpeechRecognition();
     recognition.lang = "es-ES";
     recognition.continuous = true;
@@ -171,7 +156,7 @@ const toggleGrabacion = () => {
       let interim = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         if (e.results[i].isFinal) {
-          transcripcion.value += e.results[i][0].transcript;
+          transcripcion.value += e.results[i][0].transcript + " ";
         } else {
           interim += e.results[i][0].transcript;
         }
@@ -179,30 +164,41 @@ const toggleGrabacion = () => {
       textoEnVivo.value = interim;
     };
 
-    // Es vital añadir un manejador de errores para que el botón no se quede "pillado"
     recognition.onerror = (event: any) => {
       console.error("Error Speech:", event.error);
-      grabando.value = false;
-      if (event.error === "not-allowed") {
-        alert("El acceso al micrófono ha sido bloqueado.");
+      // 'no-speech' y 'audio-capture' son errores recuperables en Android, no frenamos
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        grabando.value = false;
+        alert("El acceso al micrófono ha sido bloqueado. Revisa los permisos del navegador.");
       }
     };
 
     recognition.onend = () => {
-      grabando.value = false;
-      textoEnVivo.value = "";
+      // AUTO-REINICIO: si el usuario sigue grabando, reiniciamos automáticamente
+      // Esto soluciona el corte en Android y Chrome iOS
+      if (grabando.value) {
+        try {
+          recognition.start();
+        } catch (e) {
+          // Evita el error si ya está activo (race condition)
+        }
+      } else {
+        textoEnVivo.value = "";
+      }
     };
   }
 
   if (grabando.value) {
+    grabando.value = false; // Lo ponemos a false ANTES de stop() para que onend no reinicie
     try {
       recognition.stop();
     } catch (e) {
-      grabando.value = false;
+      // ignorar
     }
   } else {
     try {
       textoEnVivo.value = "";
+      transcripcion.value = ""; // Limpiamos también la transcripción al iniciar nueva grabación
       recognition.start();
       grabando.value = true;
     } catch (e) {
