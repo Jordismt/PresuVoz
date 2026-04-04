@@ -790,7 +790,102 @@ const limpiarTodoElHistorial = async () => {
               </div>
             </div>
             <br />
+<section class="py-20 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-black text-slate-900 tracking-tighter mb-4 uppercase">
+        ¿Cómo funciona PresuVoz?
+      </h2>
+      <p class="text-lg text-slate-500 font-medium max-w-2xl mx-auto">
+        Del audio al PDF en menos de 1 minuto. Así de fácil es profesionalizar tu negocio.
+      </p>
+    </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col">
+        <div class="w-full aspect-video bg-slate-100 rounded-3xl mb-6 overflow-hidden border border-slate-50 flex items-center justify-center p-4">
+          <img src="/img/paso-registro.png" alt="Registro Google" 
+               class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500">
+        </div>
+        
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-black text-lg">1</div>
+          <h3 class="text-xl font-black text-slate-800 italic">Registro Express</h3>
+        </div>
+        <p class="text-slate-500 text-sm leading-relaxed font-medium">
+          Crea tu cuenta con un click usando Google. Te regalamos <span class="text-indigo-600 font-bold">1 Crédito IA</span>.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col">
+        <div class="w-full aspect-video bg-slate-100 rounded-3xl mb-6 overflow-hidden border border-slate-50 flex items-center justify-center p-4">
+          <img src="/img/paso-audio.png" alt="Dictando audio" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform">
+        </div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-black text-lg">2</div>
+          <h3 class="text-xl font-black text-slate-800 italic">Habla o Escribe</h3>
+        </div>
+        <p class="text-slate-500 text-sm leading-relaxed font-medium">
+          Pulsa el micro y cuéntale a la IA lo que has hecho. Ella entiende cada detalle.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col">
+        <div class="w-full aspect-video bg-indigo-50 rounded-3xl mb-6 overflow-hidden border border-indigo-100 flex items-center justify-center p-4">
+          <img src="/img/paso-ia.png" alt="IA procesando" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform">
+        </div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-black text-lg">3</div>
+          <h3 class="text-xl font-black text-slate-800 italic">Genera al instante</h3>
+        </div>
+        <p class="text-slate-500 text-sm leading-relaxed font-medium">
+          La IA desglosa materiales y precios automáticamente. Sin errores manuales.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group border-b-4 border-b-indigo-500 flex flex-col">
+        <div class="w-full aspect-video bg-slate-100 rounded-3xl mb-6 overflow-hidden border border-slate-50 flex items-center justify-center p-4">
+          <img src="/img/paso-edicion.png" alt="Edición de tabla" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform">
+        </div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-black text-lg">4</div>
+          <h3 class="text-xl font-black text-slate-800 italic">Previsualiza y Edita</h3>
+        </div>
+        <p class="text-slate-500 text-sm leading-relaxed font-medium">
+          ¿Quieres ajustar un precio? Cámbialo a mano en la tabla antes de terminar.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group border-b-4 border-b-green-500 flex flex-col">
+        <div class="w-full aspect-video bg-green-50 rounded-3xl mb-6 overflow-hidden border border-green-100 flex items-center justify-center p-4">
+          <img src="/img/paso-whatsapp.png" alt="Envío por WhatsApp" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform">
+        </div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center font-black text-lg">5</div>
+          <h3 class="text-xl font-black text-slate-800 italic">WhatsApp y PDF</h3>
+        </div>
+        <p class="text-slate-500 text-sm leading-relaxed font-medium">
+          Envía el PDF profesional al cliente al momento. Cierra el trato en la obra.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group border-b-4 border-b-slate-800 flex flex-col">
+        <div class="w-full aspect-video bg-slate-200 rounded-3xl mb-6 overflow-hidden border border-slate-300 flex items-center justify-center p-4">
+          <img src="/img/paso-historial.png" alt="Historial de presupuestos" class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform">
+        </div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-slate-800 text-white rounded-xl flex items-center justify-center font-black text-lg">6</div>
+          <h3 class="text-xl font-black text-slate-800 italic">Historial Infinito</h3>
+        </div>
+        <p class="text-slate-500 text-sm leading-relaxed font-medium">
+          Recupera presupuestos viejos y úsalos de plantilla <span class="font-bold underline">GRATIS</span>.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
             <div class="flex flex-col items-center gap-8 sm:gap-10">
               <button
                 @click="
