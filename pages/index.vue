@@ -314,8 +314,10 @@ const toggleGrabacionSpeech = () => {
 
   recognition = new SpeechRecognition();
   recognition.lang = "es-ES";
+
+  // ESTRATEGIA ANDROID: Desactivamos interimResults para evitar el "parpadeo" de texto feo
   recognition.continuous = true;
-  recognition.interimResults = true;
+  recognition.interimResults = false;
 
   recognition.onresult = (e: any) => {
     let textoSesionActual = "";
@@ -323,24 +325,20 @@ const toggleGrabacionSpeech = () => {
     for (let i = 0; i < e.results.length; i++) {
       const result = e.results[i];
 
-      // FIX DE STACKOVERFLOW:
-      // En Android, isFinal a veces es mentira si confidence es 0.
-      // Solo aceptamos resultados finales con confianza real.
-      const esFinalReal = result.isFinal && (result[0].confidence > 0 || e.results.length > i + 1);
-
-      if (esFinalReal) {
+      // Filtro de confianza (basado en tu investigación de StackOverflow)
+      if (result.isFinal && result[0].confidence > 0) {
         const transcript = result[0].transcript.trim();
 
-        // Evitamos que Android concatene la misma frase dos veces en el mismo buffer
-        if (!textoSesionActual.includes(transcript)) {
-          textoSesionActual += transcript + " ";
+        // Blindaje total contra duplicados: Solo añadimos si la frase no existe ya
+        if (!textoSesionActual.toLowerCase().includes(transcript.toLowerCase())) {
+          textoSesionActual += (textoSesionActual ? " " : "") + transcript;
         }
       }
     }
 
-    // Aplicamos el resultado final a la transcripción
     if (textoSesionActual.trim() !== "") {
-      transcripcion.value = textoSesionActual.trim() + " ";
+      // Asignamos la frase limpia y formateada
+      transcripcion.value = textoSesionActual.charAt(0).toUpperCase() + textoSesionActual.slice(1) + ". ";
     }
 
     nextTick(() => {
@@ -350,13 +348,17 @@ const toggleGrabacionSpeech = () => {
     });
   };
 
-  // --- El resto de tu lógica (onerror, onend, start) se mantiene IGUAL ---
+  // --- Lógica de reinicio y errores (Sin cambios, es necesaria para Android) ---
   const estaInstancia = recognition;
+
   recognition.onend = () => {
-    nextTick(() => {
-      if (!grabando.value) textoEnVivo.value = "✅ Listo para generar";
-    });
-    if (!grabando.value || recognition !== estaInstancia) return;
+    if (!grabando.value) {
+      nextTick(() => {
+        textoEnVivo.value = "✅ Listo para generar";
+      });
+      return;
+    }
+    // El auto-reinicio es vital porque Android corta a los 3 seg de silencio
     setTimeout(() => {
       if (grabando.value && recognition === estaInstancia) {
         try {
@@ -376,11 +378,13 @@ const toggleGrabacionSpeech = () => {
 
   transcripcion.value = "";
   textoEnVivo.value = "⏳ Conectando...";
+
   try {
     recognition.start();
     grabando.value = true;
   } catch (e) {
     grabando.value = false;
+    recognition = null;
     textoEnVivo.value = "";
   }
 };
