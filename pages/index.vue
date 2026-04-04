@@ -1539,29 +1539,25 @@ const limpiarTodoElHistorial = async () => {
                 class="w-full min-h-[220px] bg-slate-50/50 rounded-[2rem] p-6 text-sm font-medium text-slate-600 leading-relaxed border-2 border-dashed border-slate-100 focus:border-indigo-500 focus:bg-white focus:ring-0 outline-none transition-all resize-none italic"></textarea>
 
               <div
-                v-if="textoEnVivo"
-                class="absolute bottom-20 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-[1.5rem] border border-indigo-100 shadow-xl shadow-indigo-50/50 animate-in fade-in zoom-in duration-300 pointer-events-none">
-                <div class="flex items-center gap-3">
-                  <span v-if="grabando" class="relative flex h-3 w-3">
-                    <span
-                      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
-                  </span>
-
-                  <p class="text-[12px] font-black text-indigo-600 italic tracking-tight leading-none">
-                    {{ textoEnVivo }}
-                  </p>
-                </div>
-              </div>
-
-              <div
                 v-if="grabando"
-                class="absolute bottom-4 right-6 flex items-center gap-2 bg-red-50 text-red-500 px-3 py-1.5 rounded-full border border-red-100">
+                class="absolute bottom-4 right-6 flex items-center gap-2 bg-red-50 text-red-500 px-3 py-1.5 rounded-full border border-red-100 shadow-sm">
                 <span class="w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
                 <span class="text-[10px] font-black uppercase tracking-tighter">Micro Activo</span>
               </div>
             </div>
 
+            <div
+              v-if="textoEnVivo"
+              class="mt-4 bg-indigo-600 p-4 rounded-[1.5rem] shadow-xl shadow-indigo-100 animate-in slide-in-from-top-2 duration-300">
+              <div class="flex items-center gap-3">
+                <div class="flex h-2 w-2">
+                  <span
+                    class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-white opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                </div>
+                <p class="text-[13px] font-bold text-white italic leading-tight">"{{ textoEnVivo }}..."</p>
+              </div>
+            </div>
             <div class="grid grid-cols-5 gap-3 mt-6">
               <button
                 @click="toggleGrabacion"
