@@ -460,10 +460,15 @@ const limpiarTodoElHistorial = async () => {
             <div
               class="flex items-center gap-2 sm:gap-3 group cursor-pointer"
               @click="window.scrollTo({ top: 0, behavior: 'smooth' })">
-              <div
-                class="w-8 h-8 sm:w-10 sm:h-10 bg-black rounded-xl flex items-center justify-center text-white font-black italic shadow-2xl group-hover:bg-indigo-600 transition-all duration-500 text-sm sm:text-base">
-                P
-              </div>
+<div class="relative shrink-0 transform -rotate-3 transition-transform hover:rotate-0 duration-300">
+  <div class="absolute inset-0 bg-indigo-200 rounded-2xl blur-lg opacity-40 scale-90"></div>
+  
+  <img 
+    src="/logo.png" 
+    alt="Logo PresuVoz" 
+    class="relative w-12 h-12 object-contain bg-white rounded-2xl p-1.5 shadow-lg border border-slate-100"
+  />
+</div>
               <span class="text-xl sm:text-2xl font-black tracking-tighter uppercase italic">PresuVoz</span>
             </div>
             <div class="flex items-center gap-3 sm:gap-8">
@@ -1092,26 +1097,34 @@ const limpiarTodoElHistorial = async () => {
       <header
         class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 bg-white/50 backdrop-blur-md p-6 rounded-[2.5rem] border border-white shadow-sm relative">
         <div class="flex items-center gap-4 w-full md:w-auto">
-          <div
-            class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black italic shadow-lg shadow-indigo-200 shrink-0 transform -rotate-3">
-            P
-          </div>
+<div class="relative shrink-0 transform -rotate-3 transition-transform hover:rotate-0 duration-300">
+  <div class="absolute inset-0 bg-indigo-200 rounded-2xl blur-lg opacity-40 scale-90"></div>
+  
+  <img 
+    src="/logo.png" 
+    alt="Logo PresuVoz" 
+    class="relative w-12 h-12 object-contain bg-white rounded-2xl p-1.5 shadow-lg border border-slate-100"
+  />
+</div>
           <div class="flex flex-col">
             <div class="flex items-center gap-2">
               <span
                 class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.15em] bg-indigo-50 px-2 py-0.5 rounded-md">
                 {{ profile?.plan || "Free" }}
               </span>
+
               <span class="text-sm font-bold text-slate-500 capitalize italic">
                 ¡Hola, {{ user?.email?.split("@")[0] }}! 👋
               </span>
             </div>
             <h2 class="text-2xl font-black tracking-tighter uppercase italic leading-none mt-1">
-              PresuVoz <span class="text-indigo-600">Pro</span>
+              Presu<span class="text-indigo-600">Voz</span>
             </h2>
           </div>
         </div>
-
+        <span class="text-[13px] font-black text-slate-400 uppercase tracking-widest">
+          • 1 Crédito / Uso
+        </span>
         <div
           class="flex flex-wrap items-center justify-between md:justify-end gap-3 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 border-slate-100">
           <div class="relative">
@@ -1133,7 +1146,7 @@ const limpiarTodoElHistorial = async () => {
 
               <div class="px-4 py-2.5 flex items-center gap-2 group-hover:bg-slate-800 transition-colors">
                 <p class="text-[10px] font-black uppercase tracking-[0.15em] text-indigo-400">
-                  {{ profile?.plan?.toLowerCase() === "pro" ? "Gestionar" : "Ver Planes" }}
+                  {{ profile?.plan?.toLowerCase() === "pro" ? "Gestionar" : "Más Créditos" }}
                 </p>
                 <span class="text-[10px] transform transition-transform group-hover:translate-y-0.5">
                   {{ mostrarRecargaMovil ? "▲" : "▼" }}
@@ -1656,9 +1669,71 @@ const limpiarTodoElHistorial = async () => {
             mostrarRecargaMovil = false;
           "
           v-if="profile?.plan?.toLowerCase() !== 'pro'"
-          class="w-full flex justify-between items-center p-6 bg-indigo-600 rounded-[2rem] shadow-xl shadow-indigo-500/40">
-          <span class="text-sm font-black text-white italic uppercase">Plan Pro</span>
-          <span class="text-xl font-black text-white">9,99€</span>
+          class="group relative w-full overflow-hidden bg-indigo-600 p-5 md:p-6 rounded-[2rem] shadow-xl shadow-indigo-500/30 transition-all hover:scale-[1.01] active:scale-95 border border-indigo-400/30">
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+          <div class="relative z-10 flex flex-col gap-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex flex-col text-left">
+                <div class="flex items-center gap-2 mb-1">
+                  <span
+                    class="text-[9px] font-black text-indigo-200 uppercase tracking-[0.2em] bg-white/10 px-2 py-0.5 rounded-full">
+                    Recomendado
+                  </span>
+                </div>
+                <h3
+                  class="text-xl md:text-2xl font-black text-white italic leading-none uppercase tracking-tighter">
+                  Plan Pro <span class="text-indigo-300 ml-1">⚡</span>
+                </h3>
+              </div>
+
+              <div
+                class="flex flex-row md:flex-col items-baseline md:items-end gap-2 md:gap-0 bg-black/10 md:bg-transparent p-3 md:p-0 rounded-2xl">
+                <span class="text-2xl md:text-3xl font-black text-white leading-none tracking-tighter"
+                  >9,99€</span
+                >
+                <span class="text-[9px] font-bold text-indigo-200 uppercase tracking-tighter"
+                  >/ MES + IVA</span
+                >
+              </div>
+            </div>
+
+            <div class="h-px bg-white/10 w-full"></div>
+
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="bg-white/20 p-2 rounded-xl shrink-0">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="3"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div class="flex flex-col text-left">
+                  <span class="text-xs md:text-sm font-black text-white uppercase tracking-wide">
+                    25 Créditos mensuales
+                  </span>
+                  <span class="text-[10px] text-indigo-200 font-bold uppercase"
+                    >Uso profesional ilimitado</span
+                  >
+                </div>
+              </div>
+
+              <div
+                class="flex items-center gap-1.5 bg-black/20 px-3 py-1.5 rounded-full self-end md:self-center">
+                <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></span>
+                <span class="text-[8px] md:text-[9px] font-black text-white/80 uppercase tracking-widest">
+                  Se renuevan cada mes
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="absolute inset-0 z-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
         </button>
       </div>
 
