@@ -262,35 +262,38 @@ const toggleGrabacionSpeech = () => {
 
   // PARAR
   if (grabando.value) {
-    grabando.value = false;
+    grabando.value = false; 
     try {
       recognition?.stop();
     } catch (_) {}
-    recognition = null;
+    recognition = null; 
     textoEnVivo.value = "";
     return;
   }
 
-  // INICIAR
+  // INICIAR — siempre creamos objeto nuevo y limpio
   recognition = new SpeechRecognition();
   recognition.lang = "es-ES";
   recognition.continuous = true;
   recognition.interimResults = true;
 
   recognition.onresult = (e: any) => {
+    // No guardamos nada en 'interim', así evitamos el texto raro en pantalla
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
         const transcript = e.results[i][0].transcript;
-        // Mantenemos la validación de duplicados por seguridad
+        // Solo añadimos a la transcripción si no es un duplicado
         if (!transcripcion.value.trim().endsWith(transcript.trim())) {
           transcripcion.value += transcript + " ";
         }
       }
     }
-
-    // En lugar de mostrar el 'interim' que falla, mantenemos el mensaje de estado
+    
+    // Mientras haya resultados (aunque sean intermedio), indicamos que estamos trabajando
     nextTick(() => {
-      textoEnVivo.value = "🎙️ Escuchando y escribiendo...";
+      if (grabando.value) {
+        textoEnVivo.value = "🎙️ Escuchando y procesando...";
+      }
     });
   };
 
@@ -306,11 +309,10 @@ const toggleGrabacionSpeech = () => {
   const estaInstancia = recognition;
 
   recognition.onend = () => {
-    // Si la grabación sigue activa (por el auto-reinicio de Android),
-    // mantenemos el mensaje. Si el usuario paró, limpiamos.
     nextTick(() => {
+      // Si el usuario paró la grabación, mostramos el estado final
       if (!grabando.value) {
-        textoEnVivo.value = "";
+        textoEnVivo.value = "✅ Listo para generar";
       }
     });
 
@@ -320,15 +322,14 @@ const toggleGrabacionSpeech = () => {
       if (grabando.value && recognition === estaInstancia) {
         try {
           estaInstancia.start();
-          // Aseguramos que el texto de estado vuelva a aparecer al reiniciar
-          textoEnVivo.value = "🎙️ Escuchando...";
         } catch (_) {}
       }
     }, 300);
   };
 
   transcripcion.value = "";
-  textoEnVivo.value = "🎙️ Preparando micrófono...";
+  // Estado inicial
+  textoEnVivo.value = "⏳ Conectando micrófono...";
 
   try {
     recognition.start();
