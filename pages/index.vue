@@ -267,32 +267,35 @@ const toggleGrabacionSpeech = () => {
       recognition?.stop();
     } catch (_) {}
     recognition = null; 
-    textoEnVivo.value = "";
+    
+    // Al parar, mostramos el estado final
+    textoEnVivo.value = "✅ Listo para generar";
     return;
   }
 
-  // INICIAR — siempre creamos objeto nuevo y limpio
+  // INICIAR
   recognition = new SpeechRecognition();
   recognition.lang = "es-ES";
   recognition.continuous = true;
   recognition.interimResults = true;
 
   recognition.onresult = (e: any) => {
-    // No guardamos nada en 'interim', así evitamos el texto raro en pantalla
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
         const transcript = e.results[i][0].transcript;
-        // Solo añadimos a la transcripción si no es un duplicado
+        
+        // IMPORTANTE: Guardamos en transcripcion.value pero 
+        // NO mostramos textoEnVivo para que no se vea el texto "sucio"
         if (!transcripcion.value.trim().endsWith(transcript.trim())) {
           transcripcion.value += transcript + " ";
         }
       }
     }
     
-    // Mientras haya resultados (aunque sean intermedio), indicamos que estamos trabajando
+    // En pantalla SOLO verás esto mientras hablas
     nextTick(() => {
       if (grabando.value) {
-        textoEnVivo.value = "🎙️ Escuchando y procesando...";
+        textoEnVivo.value = "🎙️ Escuchando...";
       }
     });
   };
@@ -302,42 +305,44 @@ const toggleGrabacionSpeech = () => {
     if (event.error === "not-allowed" || event.error === "service-not-allowed") {
       grabando.value = false;
       recognition = null;
-      alert("⚠️ Micrófono bloqueado.\nRevisa los permisos del navegador en Ajustes.");
+      textoEnVivo.value = "";
+      alert("⚠️ Micrófono bloqueado.");
     }
   };
 
   const estaInstancia = recognition;
 
   recognition.onend = () => {
-    nextTick(() => {
-      // Si el usuario paró la grabación, mostramos el estado final
-      if (!grabando.value) {
+    // Si el usuario paró manualmente
+    if (!grabando.value) {
+      nextTick(() => {
         textoEnVivo.value = "✅ Listo para generar";
-      }
-    });
+      });
+      return;
+    }
 
-    if (!grabando.value || recognition !== estaInstancia) return;
-
+    // Auto-reinicio (manteniendo el mensaje de "Escuchando")
     setTimeout(() => {
       if (grabando.value && recognition === estaInstancia) {
         try {
           estaInstancia.start();
+          textoEnVivo.value = "🎙️ Escuchando...";
         } catch (_) {}
       }
     }, 300);
   };
 
+  // Resetear al empezar
   transcripcion.value = "";
-  // Estado inicial
-  textoEnVivo.value = "⏳ Conectando micrófono...";
+  textoEnVivo.value = "⏳ Conectando...";
 
   try {
     recognition.start();
     grabando.value = true;
   } catch (e) {
-    alert("❌ Error al iniciar el dictado. Vuelve a intentarlo.");
     grabando.value = false;
     recognition = null;
+    textoEnVivo.value = "";
   }
 };
 // ── FUNCIÓN PRINCIPAL ─────────────────────────────────────────────────────────
