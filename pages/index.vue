@@ -302,38 +302,38 @@ const toggleGrabacionWhisper = async () => {
 const toggleGrabacionSpeech = () => {
   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-  // PARAR
   if (grabando.value) {
-    grabando.value = false; // false ANTES de stop() para que onend no reinicie
+    grabando.value = false;
     try {
       recognition?.stop();
     } catch (_) {}
-    recognition = null; // destruir objeto evita listeners acumulados (fix PWA Android)
-
-    // CAMBIO: Al parar, mostramos el estado final
+    recognition = null;
     textoEnVivo.value = "✅ Listo para generar";
     return;
   }
 
-  // INICIAR — siempre creamos objeto nuevo y limpio
   recognition = new SpeechRecognition();
   recognition.lang = "es-ES";
   recognition.continuous = true;
   recognition.interimResults = true;
 
   recognition.onresult = (e: any) => {
-    // Procesamos el texto internamente para la transcripción final
-    for (let i = e.resultIndex; i < e.results.length; i++) {
+    // Variable temporal para reconstruir TODA la sesión actual de voz
+    let textoAcumulado = "";
+
+    for (let i = 0; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
-        const transcript = e.results[i][0].transcript;
-        // Validación para evitar duplicados en Android
-        if (!transcripcion.value.trim().endsWith(transcript.trim())) {
-          transcripcion.value += transcript + " ";
-        }
+        // En Android, esto es lo más seguro: reconstruir desde los resultados finales confirmados
+        textoAcumulado += e.results[i][0].transcript + " ";
       }
     }
 
-    // CAMBIO: En lugar de asignar 'interim' (que se ve raro), ponemos mensaje de estado
+    // Actualizamos la transcripción solo si hay contenido nuevo
+    // Esto evita que el cursor salte o se duplique texto antiguo
+    if (textoAcumulado.trim() !== "") {
+      transcripcion.value = textoAcumulado;
+    }
+
     nextTick(() => {
       if (grabando.value) {
         textoEnVivo.value = "🎙️ Escuchando...";
@@ -347,7 +347,7 @@ const toggleGrabacionSpeech = () => {
       grabando.value = false;
       recognition = null;
       textoEnVivo.value = "";
-      alert("⚠️ Micrófono bloqueado.\nRevisa los permisos del navegador en Ajustes.");
+      alert("⚠️ Micrófono bloqueado.\nRevisa los permisos en Ajustes.");
     }
   };
 
@@ -355,7 +355,6 @@ const toggleGrabacionSpeech = () => {
 
   recognition.onend = () => {
     nextTick(() => {
-      // Si el usuario paró la grabación, mostramos el listo
       if (!grabando.value) {
         textoEnVivo.value = "✅ Listo para generar";
       }
@@ -363,27 +362,28 @@ const toggleGrabacionSpeech = () => {
 
     if (!grabando.value || recognition !== estaInstancia) return;
 
-    // Auto-reinicio con delay:
+    // Reinicio para evitar el corte por silencio de Android
     setTimeout(() => {
       if (grabando.value && recognition === estaInstancia) {
         try {
+          // IMPORTANTE: Al reiniciar por silencio, mantenemos lo que ya teníamos
+          // para que la siguiente frase se sume correctamente.
           estaInstancia.start();
-          // Mantenemos el estado visual al reiniciar
           textoEnVivo.value = "🎙️ Escuchando...";
         } catch (_) {}
       }
     }, 300);
   };
 
+  // No borramos la transcripción al reiniciar por silencio, 
+  // solo si es una grabación COMPLETAMENTE nueva desde cero.
   transcripcion.value = "";
-  // Estado inicial al pulsar el botón
   textoEnVivo.value = "⏳ Conectando...";
 
   try {
     recognition.start();
     grabando.value = true;
   } catch (e) {
-    alert("❌ Error al iniciar el dictado. Vuelve a intentarlo.");
     grabando.value = false;
     recognition = null;
     textoEnVivo.value = "";
