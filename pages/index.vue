@@ -135,9 +135,32 @@ const logout = async () => {
 
 const toggleGrabacion = () => {
   if (!process.client) return;
+
+  // 1. DETECCIÓN DE IPHONE / IPAD
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+
+  // 2. DETECCIÓN DE SI ES SAFARI REAL (Safari tiene 'Safari' en el agent pero NO 'Chrome' o 'CriOS')
+  // Chrome en iOS se identifica como 'CriOS'
+  const isSafariEfectivo =
+    isIOS &&
+    navigator.userAgent.indexOf("Safari") !== -1 &&
+    navigator.userAgent.indexOf("CriOS") === -1 &&
+    navigator.userAgent.indexOf("FxiOS") === -1; // Firefox iOS
+
+  // Si es iPhone pero NO es Safari, lanzamos el aviso y frenamos
+  if (isIOS && !isSafariEfectivo) {
+    return alert(
+      "⚠️ El dictado por voz tiene limitaciones en Chrome para iPhone.\n\nPor favor, abre PresuVoz en SAFARI o usa la opción 'Añadir a pantalla de inicio' para que funcione correctamente.",
+    );
+  }
+
+  // --- El resto de tu lógica original sigue aquí ---
   if (!recognition) {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return alert("Navegador no compatible");
+
+    if (!SpeechRecognition) {
+      return alert("Navegador no compatible con dictado por voz.");
+    }
 
     recognition = new SpeechRecognition();
     recognition.lang = "es-ES";
@@ -156,6 +179,15 @@ const toggleGrabacion = () => {
       textoEnVivo.value = interim;
     };
 
+    // Es vital añadir un manejador de errores para que el botón no se quede "pillado"
+    recognition.onerror = (event: any) => {
+      console.error("Error Speech:", event.error);
+      grabando.value = false;
+      if (event.error === "not-allowed") {
+        alert("El acceso al micrófono ha sido bloqueado.");
+      }
+    };
+
     recognition.onend = () => {
       grabando.value = false;
       textoEnVivo.value = "";
@@ -163,11 +195,20 @@ const toggleGrabacion = () => {
   }
 
   if (grabando.value) {
-    recognition.stop();
+    try {
+      recognition.stop();
+    } catch (e) {
+      grabando.value = false;
+    }
   } else {
-    textoEnVivo.value = "";
-    recognition.start();
-    grabando.value = true;
+    try {
+      textoEnVivo.value = "";
+      recognition.start();
+      grabando.value = true;
+    } catch (e) {
+      alert("Error al iniciar el dictado. Reintenta.");
+      grabando.value = false;
+    }
   }
 };
 
@@ -460,15 +501,15 @@ const limpiarTodoElHistorial = async () => {
             <div
               class="flex items-center gap-2 sm:gap-3 group cursor-pointer"
               @click="window.scrollTo({ top: 0, behavior: 'smooth' })">
-<div class="relative shrink-0 transform -rotate-3 transition-transform hover:rotate-0 duration-300">
-  <div class="absolute inset-0 bg-indigo-200 rounded-2xl blur-lg opacity-40 scale-90"></div>
-  
-  <img 
-    src="/logo.png" 
-    alt="Logo PresuVoz" 
-    class="relative w-12 h-12 object-contain bg-white rounded-2xl p-1.5 shadow-lg border border-slate-100"
-  />
-</div>
+              <div
+                class="relative shrink-0 transform -rotate-3 transition-transform hover:rotate-0 duration-300">
+                <div class="absolute inset-0 bg-indigo-200 rounded-2xl blur-lg opacity-40 scale-90"></div>
+
+                <img
+                  src="/logo.png"
+                  alt="Logo PresuVoz"
+                  class="relative w-12 h-12 object-contain bg-white rounded-2xl p-1.5 shadow-lg border border-slate-100" />
+              </div>
               <span class="text-xl sm:text-2xl font-black tracking-tighter uppercase italic">PresuVoz</span>
             </div>
             <div class="flex items-center gap-3 sm:gap-8">
@@ -1097,15 +1138,14 @@ const limpiarTodoElHistorial = async () => {
       <header
         class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 bg-white/50 backdrop-blur-md p-6 rounded-[2.5rem] border border-white shadow-sm relative">
         <div class="flex items-center gap-4 w-full md:w-auto">
-<div class="relative shrink-0 transform -rotate-3 transition-transform hover:rotate-0 duration-300">
-  <div class="absolute inset-0 bg-indigo-200 rounded-2xl blur-lg opacity-40 scale-90"></div>
-  
-  <img 
-    src="/logo.png" 
-    alt="Logo PresuVoz" 
-    class="relative w-12 h-12 object-contain bg-white rounded-2xl p-1.5 shadow-lg border border-slate-100"
-  />
-</div>
+          <div class="relative shrink-0 transform -rotate-3 transition-transform hover:rotate-0 duration-300">
+            <div class="absolute inset-0 bg-indigo-200 rounded-2xl blur-lg opacity-40 scale-90"></div>
+
+            <img
+              src="/logo.png"
+              alt="Logo PresuVoz"
+              class="relative w-12 h-12 object-contain bg-white rounded-2xl p-1.5 shadow-lg border border-slate-100" />
+          </div>
           <div class="flex flex-col">
             <div class="flex items-center gap-2">
               <span
