@@ -133,80 +133,209 @@ const logout = async () => {
   mostrarLanding.value = true;
 };
 
-const toggleGrabacion = () => {
-  if (!process.client) return;
+// ─────────────────────────────────────────────────────────────────────────────
+// PASO 1: Añade estas variables junto al resto de tus ref() al inicio del script
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const SpeechRecognition =
-    (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+let mediaRecorder: MediaRecorder | null = null
+let audioChunks: Blob[] = []
+// (recognition ya la tienes declarada como: let recognition: any = null)
 
-  // Si el navegador no soporta SpeechRecognition en absoluto, informamos
-  if (!SpeechRecognition) {
-    return alert(
-      "⚠️ Tu navegador no soporta dictado por voz.\n\nEn iPhone usa Safari. En Android usa Chrome."
-    );
-  }
 
-  if (!recognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = "es-ES";
-    recognition.continuous = true;
-    recognition.interimResults = true;
+// ─────────────────────────────────────────────────────────────────────────────
+// PASO 2: Reemplaza TODA tu función toggleGrabacion con este bloque completo
+// ─────────────────────────────────────────────────────────────────────────────
 
-    recognition.onresult = (e: any) => {
-      let interim = "";
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (e.results[i].isFinal) {
-          transcripcion.value += e.results[i][0].transcript + " ";
-        } else {
-          interim += e.results[i][0].transcript;
-        }
-      }
-      textoEnVivo.value = interim;
-    };
+// ── Detecta si el navegador tiene SpeechRecognition de verdad ────────────────
+const tieneSpeechRecognition = (): boolean => {
+  return !!(
+    (window as any).SpeechRecognition ||
+    (window as any).webkitSpeechRecognition
+  )
+}
 
-    recognition.onerror = (event: any) => {
-      console.error("Error Speech:", event.error);
-      // 'no-speech' y 'audio-capture' son errores recuperables en Android, no frenamos
-      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-        grabando.value = false;
-        alert("El acceso al micrófono ha sido bloqueado. Revisa los permisos del navegador.");
-      }
-    };
+// ── Detecta plataforma ────────────────────────────────────────────────────────
+const esIOS = (): boolean =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
 
-    recognition.onend = () => {
-      // AUTO-REINICIO: si el usuario sigue grabando, reiniciamos automáticamente
-      // Esto soluciona el corte en Android y Chrome iOS
-      if (grabando.value) {
-        try {
-          recognition.start();
-        } catch (e) {
-          // Evita el error si ya está activo (race condition)
-        }
-      } else {
-        textoEnVivo.value = "";
-      }
-    };
-  }
+const esCriOS = (): boolean => /CriOS/.test(navigator.userAgent)   // Chrome en iPhone
+const esFxiOS = (): boolean => /FxiOS/.test(navigator.userAgent)   // Firefox en iPhone
 
+// ── Necesita MediaRecorder (Whisper) en vez de SpeechRecognition ─────────────
+// Chrome y Firefox en iPhone no tienen webkitSpeechRecognition real.
+// También lo usamos si el navegador directamente no tiene SpeechRecognition.
+const necesitaWhisper = (): boolean => {
+  if (!process.client) return false
+  if (esIOS() && (esCriOS() || esFxiOS())) return true   // Chrome/Firefox iPhone
+  if (!tieneSpeechRecognition()) return true              // cualquier otro sin soporte
+  return false
+}
+
+
+// ── RUTA A: MediaRecorder → Groq Whisper (Chrome iOS, Firefox iOS, sin SR) ───
+const toggleGrabacionWhisper = async () => {
+  // PARAR
   if (grabando.value) {
-    grabando.value = false; // Lo ponemos a false ANTES de stop() para que onend no reinicie
-    try {
-      recognition.stop();
-    } catch (e) {
-      // ignorar
+    grabando.value = false
+    mediaRecorder?.stop()   // dispara onstop → envía a Whisper automáticamente
+    return
+  }
+
+  // INICIAR
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    audioChunks = []
+
+    // Elegimos el mejor formato soportado por el dispositivo
+    const mimeType =
+      MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' :
+      MediaRecorder.isTypeSupported('audio/webm')             ? 'audio/webm' :
+      MediaRecorder.isTypeSupported('audio/mp4')              ? 'audio/mp4' :
+      ''   // dejar que el browser elija
+
+    mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) audioChunks.push(e.data)
     }
-  } else {
-    try {
-      textoEnVivo.value = "";
-      transcripcion.value = ""; // Limpiamos también la transcripción al iniciar nueva grabación
-      recognition.start();
-      grabando.value = true;
-    } catch (e) {
-      alert("Error al iniciar el dictado. Reintenta.");
-      grabando.value = false;
+
+    mediaRecorder.onstop = async () => {
+      // Liberar micrófono siempre
+      stream.getTracks().forEach(t => t.stop())
+
+      if (audioChunks.length === 0) return
+
+      const finalMime = mimeType || 'audio/webm'
+      const audioBlob = new Blob(audioChunks, { type: finalMime })
+
+      // Enviar a nuestro endpoint /api/transcribir
+      cargandoIA.value = true
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        const formData = new FormData()
+        formData.append('audio', audioBlob, finalMime.includes('mp4') ? 'audio.mp4' : 'audio.webm')
+
+        const res = await fetch('/api/transcribir', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body: formData,
+        })
+
+        if (!res.ok) {
+          const err = await res.json()
+          throw new Error(err.statusMessage || 'Error al transcribir')
+        }
+
+        const { texto } = await res.json()
+        if (texto) transcripcion.value += texto + ' '
+
+      } catch (e: any) {
+        alert('❌ Error transcribiendo: ' + e.message)
+      } finally {
+        cargandoIA.value = false
+      }
+    }
+
+    // chunk cada segundo para no perder nada si el usuario para abruptamente
+    mediaRecorder.start(1000)
+    grabando.value = true
+
+  } catch (e: any) {
+    if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+      alert('⚠️ Permiso de micrófono denegado.\n\nVe a Ajustes > [Navegador] > Micrófono y actívalo.')
+    } else {
+      alert('❌ No se pudo acceder al micrófono: ' + e.name)
+    }
+    grabando.value = false
+  }
+}
+
+
+// ── RUTA B: SpeechRecognition (Safari iOS, Chrome Android, PWA Android) ───────
+const toggleGrabacionSpeech = () => {
+  const SpeechRecognition =
+    (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+
+  // PARAR
+  if (grabando.value) {
+    grabando.value = false          // false ANTES de stop() para que onend no reinicie
+    try { recognition?.stop() } catch (_) {}
+    recognition = null              // destruir objeto evita listeners acumulados (fix PWA Android)
+    textoEnVivo.value = ''
+    return
+  }
+
+  // INICIAR — siempre creamos objeto nuevo y limpio
+  recognition = new SpeechRecognition()
+  recognition.lang = 'es-ES'
+  recognition.continuous = true
+  recognition.interimResults = true
+
+  recognition.onresult = (e: any) => {
+    let interim = ''
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        transcripcion.value += e.results[i][0].transcript + ' '
+      } else {
+        interim += e.results[i][0].transcript
+      }
+    }
+    textoEnVivo.value = interim
+  }
+
+  recognition.onerror = (event: any) => {
+    console.error('Speech error:', event.error)
+    // Solo paramos en errores definitivos, no en 'no-speech' o 'network' (recuperables)
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      grabando.value = false
+      recognition = null
+      alert('⚠️ Micrófono bloqueado.\nRevisa los permisos del navegador en Ajustes.')
     }
   }
-};
+
+  // Referencia local para verificar que onend pertenece a ESTA sesión
+  const estaInstancia = recognition
+
+  recognition.onend = () => {
+    textoEnVivo.value = ''
+
+    // Si el usuario ya paró (grabando=false) o creamos una instancia nueva → no reiniciar
+    if (!grabando.value || recognition !== estaInstancia) return
+
+    // Auto-reinicio con delay: soluciona el corte automático en Android (PWA y navegador)
+    // El delay de 300ms evita el loop infinito de start→onend→start en PWA
+    setTimeout(() => {
+      if (grabando.value && recognition === estaInstancia) {
+        try { estaInstancia.start() } catch (_) {}
+      }
+    }, 300)
+  }
+
+  // Reset texto y arrancar
+  transcripcion.value = ''
+  textoEnVivo.value = ''
+
+  try {
+    recognition.start()
+    grabando.value = true
+  } catch (e) {
+    alert('❌ Error al iniciar el dictado. Vuelve a intentarlo.')
+    grabando.value = false
+    recognition = null
+  }
+}
+
+
+// ── FUNCIÓN PRINCIPAL ─────────────────────────────────────────────────────────
+const toggleGrabacion = () => {
+  if (!process.client) return
+
+  if (necesitaWhisper()) {
+    toggleGrabacionWhisper()
+  } else {
+    toggleGrabacionSpeech()
+  }
+}
 
 const generarConIA = async () => {
   if (!transcripcion.value) return;
