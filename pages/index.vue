@@ -262,43 +262,35 @@ const toggleGrabacionSpeech = () => {
 
   // PARAR
   if (grabando.value) {
-    grabando.value = false; // false ANTES de stop() para que onend no reinicie
+    grabando.value = false;
     try {
       recognition?.stop();
     } catch (_) {}
-    recognition = null; // destruir objeto evita listeners acumulados (fix PWA Android)
+    recognition = null;
     textoEnVivo.value = "";
     return;
   }
 
-  // INICIAR — siempre creamos objeto nuevo y limpio
+  // INICIAR
   recognition = new SpeechRecognition();
   recognition.lang = "es-ES";
   recognition.continuous = true;
   recognition.interimResults = true;
 
   recognition.onresult = (e: any) => {
-    let interimParaMostrar = ""; // Usamos variable local limpia en cada evento
-    
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      const transcript = e.results[i][0].transcript;
-      
       if (e.results[i].isFinal) {
-        // VALIDACIÓN: Evita que Android añada la misma frase dos veces si el motor se confunde
+        const transcript = e.results[i][0].transcript;
+        // Mantenemos la validación de duplicados por seguridad
         if (!transcripcion.value.trim().endsWith(transcript.trim())) {
           transcripcion.value += transcript + " ";
         }
-      } else {
-        // Acumulamos solo el texto temporal actual
-        interimParaMostrar += transcript;
       }
     }
 
-    // El nextTick es clave para la reactividad en móviles
+    // En lugar de mostrar el 'interim' que falla, mantenemos el mensaje de estado
     nextTick(() => {
-      // Si hay texto temporal, lo mostramos. Si no, ponemos un indicador de escucha
-      // Esto evita que el campo quede vacío o haga "saltos" visuales
-      textoEnVivo.value = interimParaMostrar || "🎙️ Escuchando...";
+      textoEnVivo.value = "🎙️ Escuchando y escribiendo...";
     });
   };
 
@@ -311,25 +303,25 @@ const toggleGrabacionSpeech = () => {
     }
   };
 
-  // Referencia local para verificar que onend pertenece a ESTA sesión
   const estaInstancia = recognition;
 
   recognition.onend = () => {
+    // Si la grabación sigue activa (por el auto-reinicio de Android),
+    // mantenemos el mensaje. Si el usuario paró, limpiamos.
     nextTick(() => {
-      // Solo limpiamos si realmente hemos terminado la sesión de grabación
-      if (!grabando.value) textoEnVivo.value = "";
+      if (!grabando.value) {
+        textoEnVivo.value = "";
+      }
     });
 
-    // Si el usuario ya paró o hay una instancia nueva → no reiniciar
     if (!grabando.value || recognition !== estaInstancia) return;
 
-    // Auto-reinicio con delay:
-    // - Soluciona el corte automático tras silencio en Android
-    // - El delay de 300ms evita el loop infinito start→onend→start en PWA Android
     setTimeout(() => {
       if (grabando.value && recognition === estaInstancia) {
         try {
           estaInstancia.start();
+          // Aseguramos que el texto de estado vuelva a aparecer al reiniciar
+          textoEnVivo.value = "🎙️ Escuchando...";
         } catch (_) {}
       }
     }, 300);
@@ -347,7 +339,6 @@ const toggleGrabacionSpeech = () => {
     recognition = null;
   }
 };
-
 // ── FUNCIÓN PRINCIPAL ─────────────────────────────────────────────────────────
 const toggleGrabacion = () => {
   if (!process.client) return;
