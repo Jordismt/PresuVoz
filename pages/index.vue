@@ -562,13 +562,28 @@ const limpiarTodoElHistorial = async () => {
               <br class="hidden sm:block" />
               <span class="italic font-serif opacity-90">y consigue más clientes</span>
             </h1>
+            <div
+              class="bg-slate-900 rounded-[2.5rem] sm:rounded-[4rem] p-2 sm:p-4 shadow-2xl border border-slate-800 relative overflow-hidden">
+              <div
+                class="absolute top-6 right-6 z-10 bg-indigo-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl animate-bounce">
+                Demo Real ✨
+              </div>
 
-            <p
-              class="max-w-3xl mx-auto text-lg sm:text-xl md:text-2xl text-slate-500 font-medium mb-12 sm:mb-16 leading-relaxed text-balance px-4">
-              Para fontaneros, electricistas y reformistas que quieren responder más rápido y cerrar más
-              trabajos. Habla o escribe y obtén un presupuesto profesional listo para enviar por WhatsApp en
-              30 segundos.
-            </p>
+              <div
+                class="bg-white rounded-[2rem] sm:rounded-[3rem] overflow-hidden border border-slate-200 relative aspect-video lg:aspect-auto lg:h-[600px]">
+                <video
+                  src="/videos/demo-presuvoz.mp4"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  class="w-full h-full object-cover shadow-inner"></video>
+
+                <div
+                  class="absolute inset-0 pointer-events-none border-[12px] sm:border-[20px] border-white/10 rounded-[2rem] sm:rounded-[3rem]"></div>
+              </div>
+            </div>
+            <br />
 
             <div class="flex flex-col items-center gap-8 sm:gap-10">
               <button
@@ -596,33 +611,21 @@ const limpiarTodoElHistorial = async () => {
                 </div>
               </div>
             </div>
+            <br />
+            <p
+              class="max-w-3xl mx-auto text-lg sm:text-xl text-slate-600 mb-12 sm:mb-16 leading-relaxed px-4 text-balance">
+              La herramienta de <strong>presupuestos por voz</strong> para fontaneros, electricistas y
+              profesionales de las reformas.
+              <span class="block mt-4 text-slate-500 font-normal">
+                Dicta tus trabajos y genera un <strong>presupuesto profesional en PDF</strong> listo para
+                enviar por WhatsApp en solo 30 segundos.
+              </span>
+            </p>
           </div>
 
           <div class="max-w-6xl mx-auto mt-20 sm:mt-32 px-4 sm:px-6 relative">
             <div
               class="absolute -top-10 sm:-top-20 left-1/2 -translate-x-1/2 w-[110%] h-[300px] sm:h-[500px] bg-indigo-600/5 blur-[60px] sm:blur-[120px] rounded-full -z-10"></div>
-
-            <div
-              class="bg-slate-900 rounded-[2.5rem] sm:rounded-[4rem] p-2 sm:p-4 shadow-2xl border border-slate-800 relative overflow-hidden">
-              <div
-                class="absolute top-6 right-6 z-10 bg-indigo-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl animate-bounce">
-                Demo Real ✨
-              </div>
-
-              <div
-                class="bg-white rounded-[2rem] sm:rounded-[3rem] overflow-hidden border border-slate-200 relative aspect-video lg:aspect-auto lg:h-[600px]">
-                <video
-                  src="/videos/demo-presuvoz.mp4"
-                  autoplay
-                  loop
-                  muted
-                  playsinline
-                  class="w-full h-full object-cover shadow-inner"></video>
-
-                <div
-                  class="absolute inset-0 pointer-events-none border-[12px] sm:border-[20px] border-white/10 rounded-[2rem] sm:rounded-[3rem]"></div>
-              </div>
-            </div>
 
             <p class="text-center mt-8 text-slate-400 text-sm font-medium">
               Voz real procesada con nuestra IA en menos de 10 segundos.
@@ -826,6 +829,83 @@ const limpiarTodoElHistorial = async () => {
           </div>
         </section>
 
+        <section class="py-16 bg-slate-50">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                Lo que dicen otros profesionales
+              </h2>
+              <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+                Autónomos que ya han dejado de perder horas de oficina y han pasado al presupuesto por voz.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div
+                class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-1 text-amber-400 mb-4">
+                  <span>★★★★★</span>
+                </div>
+                <p class="text-slate-600 italic mb-6">
+                  "Antes llegaba a casa a las 8 de la tarde y me ponía a escribir presupuestos. Ahora los
+                  envío desde la furgoneta nada más terminar el aviso. Una joya."
+                </p>
+                <div class="flex items-center gap-4">
+                  <div
+                    class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold">
+                    JR
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-slate-900">Juan Rodríguez</h4>
+                    <p class="text-sm text-slate-500">Fontanería</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-1 text-amber-400 mb-4">
+                  <span>★★★★★</span>
+                </div>
+                <p class="text-slate-600 italic mb-6">
+                  "A mis clientes les encanta que les llegue el PDF por WhatsApp al momento. Da una imagen de
+                  profesionalidad que antes no tenía."
+                </p>
+                <div class="flex items-center gap-4">
+                  <div
+                    class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold">
+                    MS
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-slate-900">Miguel Sánchez</h4>
+                    <p class="text-sm text-slate-500">Instalaciones Eléctricas</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-1 text-amber-400 mb-4">
+                  <span>★★★★★</span>
+                </div>
+                <p class="text-slate-600 italic mb-6">
+                  "Dictar los materiales y la mano de obra mientras recojo las herramientas me ahorra por lo
+                  menos 5 horas de oficina a la semana. Imprescindible."
+                </p>
+                <div class="flex items-center gap-4">
+                  <div
+                    class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold">
+                    CA
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-slate-900">Carlos Arenas</h4>
+                    <p class="text-sm text-slate-500">Reformas Integrales</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
         <section class="py-20 sm:py-32 bg-slate-50 border-t border-slate-200/50 relative overflow-hidden">
           <div
             class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 pointer-events-none"></div>
