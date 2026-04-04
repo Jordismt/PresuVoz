@@ -262,41 +262,34 @@ const toggleGrabacionSpeech = () => {
 
   // PARAR
   if (grabando.value) {
-    grabando.value = false; 
+    grabando.value = false; // false ANTES de stop() para que onend no reinicie
     try {
       recognition?.stop();
     } catch (_) {}
-    recognition = null; 
-    
-    // Al parar, mostramos el estado final
-    textoEnVivo.value = "✅ Listo para generar";
+    recognition = null; // destruir objeto evita listeners acumulados (fix PWA Android)
+    textoEnVivo.value = "";
     return;
   }
 
-  // INICIAR
+  // INICIAR — siempre creamos objeto nuevo y limpio
   recognition = new SpeechRecognition();
   recognition.lang = "es-ES";
   recognition.continuous = true;
   recognition.interimResults = true;
 
   recognition.onresult = (e: any) => {
+    let interim = "";
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
-        const transcript = e.results[i][0].transcript;
-        
-        // IMPORTANTE: Guardamos en transcripcion.value pero 
-        // NO mostramos textoEnVivo para que no se vea el texto "sucio"
-        if (!transcripcion.value.trim().endsWith(transcript.trim())) {
-          transcripcion.value += transcript + " ";
-        }
+        transcripcion.value += e.results[i][0].transcript + " ";
+      } else {
+        interim += e.results[i][0].transcript;
       }
     }
-    
-    // En pantalla SOLO verás esto mientras hablas
+    // nextTick fuerza el re-render en móvil donde Vue a veces no actualiza
+    // el DOM en el mismo ciclo que el evento de audio
     nextTick(() => {
-      if (grabando.value) {
-        textoEnVivo.value = "🎙️ Escuchando...";
-      }
+      textoEnVivo.value = interim;
     });
   };
 
@@ -305,46 +298,47 @@ const toggleGrabacionSpeech = () => {
     if (event.error === "not-allowed" || event.error === "service-not-allowed") {
       grabando.value = false;
       recognition = null;
-      textoEnVivo.value = "";
-      alert("⚠️ Micrófono bloqueado.");
+      alert("⚠️ Micrófono bloqueado.\nRevisa los permisos del navegador en Ajustes.");
     }
+    // no-speech, network, audio-capture → recuperables, onend gestiona el reinicio
   };
 
+  // Referencia local para verificar que onend pertenece a ESTA sesión
   const estaInstancia = recognition;
 
   recognition.onend = () => {
-    // Si el usuario paró manualmente
-    if (!grabando.value) {
-      nextTick(() => {
-        textoEnVivo.value = "✅ Listo para generar";
-      });
-      return;
-    }
+    nextTick(() => {
+      textoEnVivo.value = "";
+    });
 
-    // Auto-reinicio (manteniendo el mensaje de "Escuchando")
+    // Si el usuario ya paró o hay una instancia nueva → no reiniciar
+    if (!grabando.value || recognition !== estaInstancia) return;
+
+    // Auto-reinicio con delay:
+    // - Soluciona el corte automático tras silencio en Android
+    // - El delay de 300ms evita el loop infinito start→onend→start en PWA Android
     setTimeout(() => {
       if (grabando.value && recognition === estaInstancia) {
         try {
           estaInstancia.start();
-          textoEnVivo.value = "🎙️ Escuchando...";
         } catch (_) {}
       }
     }, 300);
   };
 
-  // Resetear al empezar
   transcripcion.value = "";
-  textoEnVivo.value = "⏳ Conectando...";
+  textoEnVivo.value = "";
 
   try {
     recognition.start();
     grabando.value = true;
   } catch (e) {
+    alert("❌ Error al iniciar el dictado. Vuelve a intentarlo.");
     grabando.value = false;
     recognition = null;
-    textoEnVivo.value = "";
   }
 };
+
 // ── FUNCIÓN PRINCIPAL ─────────────────────────────────────────────────────────
 const toggleGrabacion = () => {
   if (!process.client) return;
