@@ -309,7 +309,9 @@ const toggleGrabacionSpeech = () => {
       recognition?.stop();
     } catch (_) {}
     recognition = null; // destruir objeto evita listeners acumulados (fix PWA Android)
-    textoEnVivo.value = "";
+
+    // CAMBIO: Al parar, mostramos el estado final
+    textoEnVivo.value = "✅ Listo para generar";
     return;
   }
 
@@ -320,18 +322,22 @@ const toggleGrabacionSpeech = () => {
   recognition.interimResults = true;
 
   recognition.onresult = (e: any) => {
-    let interim = "";
+    // Procesamos el texto internamente para la transcripción final
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
-        transcripcion.value += e.results[i][0].transcript + " ";
-      } else {
-        interim += e.results[i][0].transcript;
+        const transcript = e.results[i][0].transcript;
+        // Validación para evitar duplicados en Android
+        if (!transcripcion.value.trim().endsWith(transcript.trim())) {
+          transcripcion.value += transcript + " ";
+        }
       }
     }
-    // nextTick fuerza el re-render en móvil donde Vue a veces no actualiza
-    // el DOM en el mismo ciclo que el evento de audio
+
+    // CAMBIO: En lugar de asignar 'interim' (que se ve raro), ponemos mensaje de estado
     nextTick(() => {
-      textoEnVivo.value = interim;
+      if (grabando.value) {
+        textoEnVivo.value = "🎙️ Escuchando...";
+      }
     });
   };
 
@@ -340,36 +346,38 @@ const toggleGrabacionSpeech = () => {
     if (event.error === "not-allowed" || event.error === "service-not-allowed") {
       grabando.value = false;
       recognition = null;
+      textoEnVivo.value = "";
       alert("⚠️ Micrófono bloqueado.\nRevisa los permisos del navegador en Ajustes.");
     }
-    // no-speech, network, audio-capture → recuperables, onend gestiona el reinicio
   };
 
-  // Referencia local para verificar que onend pertenece a ESTA sesión
   const estaInstancia = recognition;
 
   recognition.onend = () => {
     nextTick(() => {
-      textoEnVivo.value = "";
+      // Si el usuario paró la grabación, mostramos el listo
+      if (!grabando.value) {
+        textoEnVivo.value = "✅ Listo para generar";
+      }
     });
 
-    // Si el usuario ya paró o hay una instancia nueva → no reiniciar
     if (!grabando.value || recognition !== estaInstancia) return;
 
     // Auto-reinicio con delay:
-    // - Soluciona el corte automático tras silencio en Android
-    // - El delay de 300ms evita el loop infinito start→onend→start en PWA Android
     setTimeout(() => {
       if (grabando.value && recognition === estaInstancia) {
         try {
           estaInstancia.start();
+          // Mantenemos el estado visual al reiniciar
+          textoEnVivo.value = "🎙️ Escuchando...";
         } catch (_) {}
       }
     }, 300);
   };
 
   transcripcion.value = "";
-  textoEnVivo.value = "";
+  // Estado inicial al pulsar el botón
+  textoEnVivo.value = "⏳ Conectando...";
 
   try {
     recognition.start();
@@ -378,6 +386,7 @@ const toggleGrabacionSpeech = () => {
     alert("❌ Error al iniciar el dictado. Vuelve a intentarlo.");
     grabando.value = false;
     recognition = null;
+    textoEnVivo.value = "";
   }
 };
 
@@ -1922,38 +1931,49 @@ const limpiarTodoElHistorial = async () => {
           </button>
         </div>
 
-<div class="flex flex-col items-center justify-center mb-6">
-  <div class="relative group">
-    <label class="block cursor-pointer">
-      <div class="w-24 h-24 rounded-[2rem] bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden transition-all group-hover:border-indigo-300">
-        <img v-if="configEmpresa.logo" :src="configEmpresa.logo" class="w-full h-full object-cover" />
-        <div v-else class="flex flex-col items-center text-slate-400">
-          <span class="text-2xl">📷</span>
+        <div class="flex flex-col items-center justify-center mb-6">
+          <div class="relative group">
+            <label class="block cursor-pointer">
+              <div
+                class="w-24 h-24 rounded-[2rem] bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden transition-all group-hover:border-indigo-300">
+                <img v-if="configEmpresa.logo" :src="configEmpresa.logo" class="w-full h-full object-cover" />
+                <div v-else class="flex flex-col items-center text-slate-400">
+                  <span class="text-2xl">📷</span>
+                </div>
+              </div>
+              <input type="file" @change="subirLogo" accept="image/*" class="hidden" />
+            </label>
+
+            <div
+              v-if="!configEmpresa.logo"
+              class="absolute -bottom-1 -right-1 bg-indigo-600 text-white w-8 h-8 rounded-xl flex items-center justify-center shadow-lg border-2 border-white text-xs pointer-events-none">
+              +
+            </div>
+
+            <button
+              v-else
+              @click="eliminarLogo"
+              type="button"
+              class="absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 rounded-xl flex items-center justify-center shadow-lg border-2 border-white hover:bg-red-600 transition-colors"
+              title="Quitar logo">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="3"
+                  d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <span class="text-[10px] text-slate-400 font-black mt-3 uppercase tracking-widest">
+            {{ configEmpresa.logo ? "Click para cambiar logo" : "Subir logo" }}
+          </span>
         </div>
-      </div>
-      <input type="file" @change="subirLogo" accept="image/*" class="hidden" />
-    </label>
-
-    <div v-if="!configEmpresa.logo" class="absolute -bottom-1 -right-1 bg-indigo-600 text-white w-8 h-8 rounded-xl flex items-center justify-center shadow-lg border-2 border-white text-xs pointer-events-none">
-      +
-    </div>
-
-    <button 
-      v-else 
-      @click="eliminarLogo"
-      type="button"
-      class="absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 rounded-xl flex items-center justify-center shadow-lg border-2 border-white hover:bg-red-600 transition-colors"
-      title="Quitar logo"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
-  <span class="text-[10px] text-slate-400 font-black mt-3 uppercase tracking-widest">
-    {{ configEmpresa.logo ? 'Click para cambiar logo' : 'Subir logo' }}
-  </span>
-</div>
 
         <div class="space-y-4">
           <div>
