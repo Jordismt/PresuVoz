@@ -43,10 +43,40 @@ const configEmpresa = ref({
   nombre: "Mi Empresa S.L.",
   nif: "11223344A",
   direccion: "Calle Falsa 123, Madrid",
+  email: "tuemail@gmail.com",
   ivaPorcentaje: 21,
   id: Math.floor(10000 + Math.random() * 90000),
   fecha: new Date().toLocaleDateString("es-ES"),
 });
+const guardarConfig = () => {
+  if (process.client) {
+    localStorage.setItem("perfil_fiscal", JSON.stringify(configEmpresa.value));
+    verConfig.value = false;
+  }
+};
+
+const subirLogo = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Validar tamaño (máx 2MB para no saturar LocalStorage)
+  if (file.size > 2 * 1024 * 1024) {
+    alert("El logo es demasiado pesado. Máximo 2MB.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    configEmpresa.value.logo = event.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+const eliminarLogo = () => {
+  configEmpresa.value.logo = null;
+  // Opcional: Guardar inmediatamente el cambio en localStorage
+  localStorage.setItem("perfil_fiscal", JSON.stringify(configEmpresa.value));
+};
 
 const handleGoogleAuth = async () => {
   cargandoAuth.value = true;
@@ -80,7 +110,8 @@ const cargarHistorial = async () => {
   listaPresupuestos.value = data || [];
 };
 
-onMounted(() => {
+onMounted(async () => {
+  // 1. TU LÓGICA EXISTENTE (Params de URL)
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get("success")) {
     mostrarLanding.value = false;
@@ -88,6 +119,17 @@ onMounted(() => {
       await fetchProfile();
       window.history.replaceState({}, document.title, "/");
     }, 2000);
+  }
+
+  // 2. NUEVA LÓGICA (Carga del Perfil Fiscal)
+  const guardado = localStorage.getItem("perfil_fiscal");
+  if (guardado) {
+    try {
+      // Cargamos los datos guardados en el ref configEmpresa
+      configEmpresa.value = JSON.parse(guardado);
+    } catch (e) {
+      console.error("Error al cargar el perfil fiscal:", e);
+    }
   }
 });
 
@@ -418,35 +460,52 @@ const prepararPDF = () => {
   const doc = new jsPDF();
   const c = configEmpresa.value;
   const p = presupuesto.value;
-  const calc = calculos.value; // Usamos tus cálculos reactivos
+  const calc = calculos.value;
 
-  // --- 1. CABECERA (MARCA Y DATOS EMISOR) ---
+  // --- 0. CONTROL DE POSICIÓN DINÁMICA ---
+  let inicioY = 20; // Posición base para el texto
+
+  // --- 1. LOGO (Si existe) ---
+  if (c.logo) {
+    try {
+      // Dibujamos el logo: x=14, y=10, ancho=30, alto=30 (proporcional)
+      doc.addImage(c.logo, "PNG", 14, 10, 30, 30);
+      inicioY = 48; // Bajamos el inicio del texto para dejar aire debajo del logo
+    } catch (e) {
+      console.error("Error al añadir el logo al PDF", e);
+    }
+  }
+
+  // --- 2. CABECERA (DATOS EMISOR) ---
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(22).setTextColor(79, 70, 229).text(c.nombre.toUpperCase(), 14, 20);
+  doc.setFontSize(22).setTextColor(79, 70, 229);
+  doc.text(c.nombre.toUpperCase(), 14, inicioY);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9).setTextColor(100);
-  doc.text(`${c.nif} • ${c.direccion}`, 14, 27);
-  doc.text(`Email: ${c.email || "Contacto@empresa.com"}`, 14, 32);
+  doc.text(`${c.nif} • ${c.direccion}`, 14, inicioY + 7);
+  doc.text(`Email: ${c.email || "Contacto@empresa.com"}`, 14, inicioY + 12);
 
-  // --- 2. INFO DEL DOCUMENTO (DERECHA) ---
-  doc.setDrawColor(220).line(130, 15, 130, 35); // Línea vertical decorativa
+  // --- 3. INFO DEL DOCUMENTO (DERECHA) ---
+  // La info del documento se mantiene arriba a la derecha para un look moderno
+  doc.setDrawColor(220).line(130, 15, 130, 40);
   doc.setFontSize(10).setTextColor(0).setFont("helvetica", "bold");
   doc.text("PRESUPUESTO", 140, 20);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(9).text(`Nº: ${c.id}`, 140, 25);
-  doc.text(`Fecha: ${c.fecha}`, 140, 30);
+  doc.setFontSize(9).text(`Nº: ${c.id}`, 140, 26);
+  doc.text(`Fecha: ${c.fecha}`, 140, 31);
 
-  // --- 3. BLOQUE CLIENTE (RECUADRO GRIS SUTIL) ---
+  // --- 4. BLOQUE CLIENTE (RECUADRO DINÁMICO) ---
+  const bloqueClienteY = Math.max(inicioY + 22, 50); // Aseguramos que no choque con la cabecera derecha
   doc.setFillColor(248, 250, 252);
-  doc.rect(14, 40, 182, 15, "F");
+  doc.rect(14, bloqueClienteY, 182, 15, "F");
   doc.setFont("helvetica", "bold").setFontSize(10).setTextColor(79, 70, 229);
-  doc.text("CLIENTE:", 20, 49);
-  doc.setTextColor(30, 41, 59).text(p.cliente.toUpperCase(), 40, 49);
+  doc.text("CLIENTE:", 20, bloqueClienteY + 9);
+  doc.setTextColor(30, 41, 59).text(p.cliente.toUpperCase(), 40, bloqueClienteY + 9);
 
-  // --- 4. TABLA DE ARTÍCULOS ---
+  // --- 5. TABLA DE ARTÍCULOS ---
   autoTable(doc, {
-    startY: 60,
+    startY: bloqueClienteY + 25,
     head: [["DESCRIPCIÓN", "CANT.", "PRECIO", "SUBTOTAL"]],
     body: p.items.map((i) => [i.desc, i.cant, `${i.precio}€`, `${(i.cant * i.precio).toFixed(2)}€`]),
     theme: "striped",
@@ -456,7 +515,7 @@ const prepararPDF = () => {
       halign: "center",
     },
     columnStyles: {
-      0: { cellWidth: 100 }, // Descripción ancha
+      0: { cellWidth: 100 },
       1: { halign: "center" },
       2: { halign: "right" },
       3: { halign: "right", fontStyle: "bold" },
@@ -464,22 +523,17 @@ const prepararPDF = () => {
     styles: { fontSize: 9, cellPadding: 4 },
   });
 
-  // --- 5. TOTALES (ALINEADOS A LA DERECHA) ---
+  // --- 6. TOTALES (ALINEADOS A LA DERECHA) ---
   const finalY = (doc as any).lastAutoTable.finalY + 10;
-  const rightAlignX = 195; // Margen derecho
+  const rightAlignX = 195;
 
   doc.setFontSize(10).setTextColor(100).setFont("helvetica", "normal");
   doc.text(`Subtotal:`, 140, finalY);
-  doc.text(`${formatCurrency(calc.subtotal)}`, rightAlignX, finalY, {
-    align: "right",
-  });
+  doc.text(`${formatCurrency(calc.subtotal)}`, rightAlignX, finalY, { align: "right" });
 
   doc.text(`IVA (${c.ivaPorcentaje}%):`, 140, finalY + 7);
-  doc.text(`${formatCurrency(calc.iva)}`, rightAlignX, finalY + 7, {
-    align: "right",
-  });
+  doc.text(`${formatCurrency(calc.iva)}`, rightAlignX, finalY + 7, { align: "right" });
 
-  // Línea de total
   doc
     .setDrawColor(79, 70, 229)
     .setLineWidth(0.5)
@@ -487,17 +541,13 @@ const prepararPDF = () => {
 
   doc.setFontSize(12).setTextColor(79, 70, 229).setFont("helvetica", "bold");
   doc.text(`TOTAL:`, 140, finalY + 17);
-  doc.text(`${formatCurrency(calc.total)}`, rightAlignX, finalY + 17, {
-    align: "right",
-  });
+  doc.text(`${formatCurrency(calc.total)}`, rightAlignX, finalY + 17, { align: "right" });
 
-  // --- 6. PIE DE PÁGINA / NOTAS LEGALES ---
+  // --- 7. PIE DE PÁGINA / NOTAS LEGALES ---
   const footerY = 275;
   doc.setFontSize(8).setTextColor(150).setFont("helvetica", "italic");
   doc.text("Este presupuesto tiene una validez de 15 días.", 14, footerY);
   doc.text("Gracias por confiar en nuestros servicios.", 14, footerY + 4);
-
-  // Branding sutil de tu app ;)
   doc.setFont("helvetica", "normal").text("Generado con PresuVoz.es", 160, footerY + 4);
 
   return doc;
@@ -1862,34 +1912,92 @@ const limpiarTodoElHistorial = async () => {
 
     <div
       v-if="verConfig"
-      class="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-6">
-      <div class="bg-white rounded-[3rem] p-10 w-full max-w-md shadow-2xl border border-white">
-        <div class="flex justify-between items-center mb-8">
-          <h3 class="text-2xl font-black text-indigo-600 italic tracking-tighter">Mi Perfil Fiscal</h3>
-          <button
-            @click="verConfig = false"
-            class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+      <div
+        class="bg-white rounded-[2.5rem] p-8 w-full max-w-md shadow-2xl border border-white relative overflow-hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-black text-slate-800 tracking-tight">Datos Fiscales</h3>
+          <button @click="verConfig = false" class="text-slate-400 hover:text-slate-600 transition-colors">
             ✕
           </button>
         </div>
-        <div class="space-y-4">
-          <input
-            v-model="configEmpresa.nombre"
-            placeholder="Nombre comercial"
-            class="w-full p-5 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold" />
-          <input
-            v-model="configEmpresa.nif"
-            placeholder="NIF / CIF"
-            class="w-full p-5 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold" />
-          <input
-            v-model="configEmpresa.direccion"
-            placeholder="Dirección"
-            class="w-full p-5 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold" />
+
+<div class="flex flex-col items-center justify-center mb-6">
+  <div class="relative group">
+    <label class="block cursor-pointer">
+      <div class="w-24 h-24 rounded-[2rem] bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden transition-all group-hover:border-indigo-300">
+        <img v-if="configEmpresa.logo" :src="configEmpresa.logo" class="w-full h-full object-cover" />
+        <div v-else class="flex flex-col items-center text-slate-400">
+          <span class="text-2xl">📷</span>
         </div>
+      </div>
+      <input type="file" @change="subirLogo" accept="image/*" class="hidden" />
+    </label>
+
+    <div v-if="!configEmpresa.logo" class="absolute -bottom-1 -right-1 bg-indigo-600 text-white w-8 h-8 rounded-xl flex items-center justify-center shadow-lg border-2 border-white text-xs pointer-events-none">
+      +
+    </div>
+
+    <button 
+      v-else 
+      @click="eliminarLogo"
+      type="button"
+      class="absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 rounded-xl flex items-center justify-center shadow-lg border-2 border-white hover:bg-red-600 transition-colors"
+      title="Quitar logo"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <span class="text-[10px] text-slate-400 font-black mt-3 uppercase tracking-widest">
+    {{ configEmpresa.logo ? 'Click para cambiar logo' : 'Subir logo' }}
+  </span>
+</div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-[10px] font-black text-indigo-500 uppercase ml-3 mb-1 block"
+              >Empresa o Autónomo</label
+            >
+            <input
+              v-model="configEmpresa.nombre"
+              placeholder="Nombre comercial"
+              class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:bg-white focus:border-indigo-500/20 focus:ring-0 transition-all font-bold text-slate-700" />
+          </div>
+
+          <div>
+            <label class="text-[10px] font-black text-indigo-500 uppercase ml-3 mb-1 block">NIF / CIF</label>
+            <input
+              v-model="configEmpresa.nif"
+              placeholder="Documento nacional"
+              class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:bg-white focus:border-indigo-500/20 focus:ring-0 transition-all font-bold text-slate-700" />
+          </div>
+
+          <div>
+            <label class="text-[10px] font-black text-indigo-500 uppercase ml-3 mb-1 block"
+              >Dirección Legal</label
+            >
+            <input
+              v-model="configEmpresa.direccion"
+              placeholder="Calle, ciudad, CP"
+              class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:bg-white focus:border-indigo-500/20 focus:ring-0 transition-all font-bold text-slate-700" />
+          </div>
+          <div class="group">
+            <label class="text-[10px] font-black text-indigo-500 ml-4 uppercase tracking-widest mb-1 block"
+              >Email de Contacto</label
+            >
+            <input
+              v-model="configEmpresa.email"
+              placeholder="tu@email.com"
+              class="w-full p-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:bg-white focus:border-indigo-100 focus:ring-0 transition-all font-bold text-slate-700" />
+          </div>
+        </div>
+
         <button
-          @click="verConfig = false"
-          class="w-full mt-10 bg-indigo-600 text-white p-5 rounded-2xl font-black shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all">
-          Guardar Cambios
+          @click="guardarConfig"
+          class="w-full mt-8 bg-indigo-600 text-white p-5 rounded-[1.5rem] font-black shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">
+          Actualizar Perfil ✨
         </button>
       </div>
     </div>
