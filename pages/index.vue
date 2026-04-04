@@ -1351,8 +1351,19 @@ const limpiarTodoElHistorial = async () => {
                 P
               </div>
               <h1 class="text-3xl font-extrabold tracking-tight">
-                {{ esRegistro ? "Crea tu cuenta" : "¡Hola de nuevo!" }}
+                {{
+                  esRegistro
+                    ? "Crea tu cuenta y recupera tus tardes"
+                    : "¡Hola! Listos para el siguiente presupuesto"
+                }}
               </h1>
+              <p class="mt-2 text-slate-500 font-medium text-sm md:text-base">
+                {{
+                  esRegistro
+                    ? "🎁 1 Crédito IA de regalo • Guarda tus trabajos • 📲Envía por WhatsApp • Copia y edita presupuestos antiguos GRATIS y sin límites."
+                    : "Entra para gestionar tus presupuestos y clientes."
+                }}
+              </p>
             </div>
 
             <div class="space-y-4">
