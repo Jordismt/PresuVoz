@@ -278,18 +278,27 @@ const toggleGrabacionSpeech = () => {
   recognition.interimResults = true;
 
   recognition.onresult = (e: any) => {
-    let interim = "";
+    let interimParaMostrar = ""; // Usamos variable local limpia en cada evento
+    
     for (let i = e.resultIndex; i < e.results.length; i++) {
+      const transcript = e.results[i][0].transcript;
+      
       if (e.results[i].isFinal) {
-        transcripcion.value += e.results[i][0].transcript + " ";
+        // VALIDACIÓN: Evita que Android añada la misma frase dos veces si el motor se confunde
+        if (!transcripcion.value.trim().endsWith(transcript.trim())) {
+          transcripcion.value += transcript + " ";
+        }
       } else {
-        interim += e.results[i][0].transcript;
+        // Acumulamos solo el texto temporal actual
+        interimParaMostrar += transcript;
       }
     }
-    // nextTick fuerza el re-render en móvil donde Vue a veces no actualiza
-    // el DOM en el mismo ciclo que el evento de audio
+
+    // El nextTick es clave para la reactividad en móviles
     nextTick(() => {
-      textoEnVivo.value = interim;
+      // Si hay texto temporal, lo mostramos. Si no, ponemos un indicador de escucha
+      // Esto evita que el campo quede vacío o haga "saltos" visuales
+      textoEnVivo.value = interimParaMostrar || "🎙️ Escuchando...";
     });
   };
 
@@ -300,7 +309,6 @@ const toggleGrabacionSpeech = () => {
       recognition = null;
       alert("⚠️ Micrófono bloqueado.\nRevisa los permisos del navegador en Ajustes.");
     }
-    // no-speech, network, audio-capture → recuperables, onend gestiona el reinicio
   };
 
   // Referencia local para verificar que onend pertenece a ESTA sesión
@@ -308,7 +316,8 @@ const toggleGrabacionSpeech = () => {
 
   recognition.onend = () => {
     nextTick(() => {
-      textoEnVivo.value = "";
+      // Solo limpiamos si realmente hemos terminado la sesión de grabación
+      if (!grabando.value) textoEnVivo.value = "";
     });
 
     // Si el usuario ya paró o hay una instancia nueva → no reiniciar
@@ -327,7 +336,7 @@ const toggleGrabacionSpeech = () => {
   };
 
   transcripcion.value = "";
-  textoEnVivo.value = "";
+  textoEnVivo.value = "🎙️ Preparando micrófono...";
 
   try {
     recognition.start();
