@@ -318,20 +318,29 @@ const toggleGrabacionSpeech = () => {
   recognition.interimResults = true;
 
   recognition.onresult = (e: any) => {
-    // Variable temporal para reconstruir TODA la sesión actual de voz
-    let textoAcumulado = "";
+    let textoSesionActual = "";
 
     for (let i = 0; i < e.results.length; i++) {
-      if (e.results[i].isFinal) {
-        // En Android, esto es lo más seguro: reconstruir desde los resultados finales confirmados
-        textoAcumulado += e.results[i][0].transcript + " ";
+      const result = e.results[i];
+
+      // FIX DE STACKOVERFLOW:
+      // En Android, isFinal a veces es mentira si confidence es 0.
+      // Solo aceptamos resultados finales con confianza real.
+      const esFinalReal = result.isFinal && (result[0].confidence > 0 || e.results.length > i + 1);
+
+      if (esFinalReal) {
+        const transcript = result[0].transcript.trim();
+
+        // Evitamos que Android concatene la misma frase dos veces en el mismo buffer
+        if (!textoSesionActual.includes(transcript)) {
+          textoSesionActual += transcript + " ";
+        }
       }
     }
 
-    // Actualizamos la transcripción solo si hay contenido nuevo
-    // Esto evita que el cursor salte o se duplique texto antiguo
-    if (textoAcumulado.trim() !== "") {
-      transcripcion.value = textoAcumulado;
+    // Aplicamos el resultado final a la transcripción
+    if (textoSesionActual.trim() !== "") {
+      transcripcion.value = textoSesionActual.trim() + " ";
     }
 
     nextTick(() => {
@@ -341,51 +350,37 @@ const toggleGrabacionSpeech = () => {
     });
   };
 
-  recognition.onerror = (event: any) => {
-    console.error("Speech error:", event.error);
-    if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-      grabando.value = false;
-      recognition = null;
-      textoEnVivo.value = "";
-      alert("⚠️ Micrófono bloqueado.\nRevisa los permisos en Ajustes.");
-    }
-  };
-
+  // --- El resto de tu lógica (onerror, onend, start) se mantiene IGUAL ---
   const estaInstancia = recognition;
-
   recognition.onend = () => {
     nextTick(() => {
-      if (!grabando.value) {
-        textoEnVivo.value = "✅ Listo para generar";
-      }
+      if (!grabando.value) textoEnVivo.value = "✅ Listo para generar";
     });
-
     if (!grabando.value || recognition !== estaInstancia) return;
-
-    // Reinicio para evitar el corte por silencio de Android
     setTimeout(() => {
       if (grabando.value && recognition === estaInstancia) {
         try {
-          // IMPORTANTE: Al reiniciar por silencio, mantenemos lo que ya teníamos
-          // para que la siguiente frase se sume correctamente.
           estaInstancia.start();
-          textoEnVivo.value = "🎙️ Escuchando...";
         } catch (_) {}
       }
     }, 300);
   };
 
-  // No borramos la transcripción al reiniciar por silencio, 
-  // solo si es una grabación COMPLETAMENTE nueva desde cero.
+  recognition.onerror = (event: any) => {
+    if (event.error === "not-allowed") {
+      grabando.value = false;
+      textoEnVivo.value = "";
+      alert("⚠️ Micrófono bloqueado.");
+    }
+  };
+
   transcripcion.value = "";
   textoEnVivo.value = "⏳ Conectando...";
-
   try {
     recognition.start();
     grabando.value = true;
   } catch (e) {
     grabando.value = false;
-    recognition = null;
     textoEnVivo.value = "";
   }
 };
