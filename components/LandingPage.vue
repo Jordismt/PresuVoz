@@ -69,7 +69,7 @@ const pasos = [
   {
     num: 1,
     titulo: "Registro Express",
-    desc: "Crea tu cuenta con un click usando Google. Te regalamos <span class='text-indigo-600 font-bold'>1 Crédito IA</span>.",
+    desc: "Crea tu cuenta con un click usando Google. Pruebalo <span class='text-indigo-600 font-bold'>GRATIS (Sin tarjeta)</span>.",
     img: "/img/paso-registro.png",
     alt: "Registro Google",
     border: "",
@@ -109,7 +109,7 @@ const pasos = [
   {
     num: 6,
     titulo: "Historial Infinito",
-    desc: "Recupera presupuestos viejos y úsalos de plantilla <span class='font-bold underline'>GRATIS</span>.",
+    desc: "Recupera presupuestos viejos y úsalos de plantilla <span class='font-bold underline'>GRATIS en el PLAN PRO</span>.",
     img: "/img/paso-historial.png",
     alt: "Historial de presupuestos",
     border: "slate",
@@ -246,7 +246,7 @@ const oficiosLinksII = [
                 ¿Cómo funciona PresuVoz?
               </h2>
               <p class="text-lg text-slate-500 font-medium max-w-2xl mx-auto">
-                Del audio al PDF en menos de 1 minuto. Así de fácil es profesionalizar tu negocio.
+                Del audio o texto al PDF en menos de 1 minuto. Así de fácil es profesionalizar tu negocio.
               </p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
