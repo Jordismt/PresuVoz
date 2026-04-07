@@ -106,7 +106,7 @@ const handleAuth = async () => {
           <p class="mt-2 text-slate-500 font-medium text-sm md:text-base">
             {{
               esRegistro
-                ? "🎁 1 Crédito IA de regalo • Guarda tus trabajos • 📲Envía por WhatsApp • Copia y edita presupuestos antiguos GRATIS y sin límites."
+                ? "🎁 Pruebalo GRATIS • Guarda tus trabajos • 📲Envía por WhatsApp • Copia y edita presupuestos antiguos GRATIS y sin límites."
                 : "Entra para gestionar tus presupuestos y clientes."
             }}
           </p>
