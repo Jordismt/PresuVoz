@@ -21,6 +21,7 @@ const filtroFecha = ref<"todos" | "hoy" | "mes">("todos");
 
 // --- LÓGICA DE FILTRADO ---
 const presupuestosFiltrados = computed(() => {
+  if (!props.esPro) return [];
   let lista = props.listaPresupuestos;
 
   // Filtro por búsqueda
