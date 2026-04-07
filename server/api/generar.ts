@@ -26,24 +26,23 @@ export default defineEventHandler(async (event) => {
   } = await supabaseAdmin.auth.getUser(token);
   if (authError || !user) throw createError({ statusCode: 401, statusMessage: "Sesión expirada" });
 
-  // 4. CONSULTAR PERFIL Y LÍMITES
-  const { data: profile, error: profError } = await supabaseAdmin
-    .from("profiles")
-    .select("requests_used, requests_limit, plan")
-    .eq("id", user.id)
-    .single();
+  const { data: resultadoPlan, error: rpcError } = await supabaseAdmin.rpc(
+    "intentar_generar_presupuesto_v2",
+    { user_id_param: user.id },
+  );
 
-  if (profError || !profile) throw createError({ statusCode: 500, statusMessage: "Error de perfil" });
-
-  // --- LÓGICA DE CRÉDITOS ACTUALIZADA ---
-  // Si ya llegó al límite (ya sean los 5 gratis o los 100 del PRO), bloqueamos.
-  if (profile.requests_used >= profile.requests_limit) {
+  // Si el RPC falla o nos devuelve que ya no hay créditos
+  if (rpcError || !resultadoPlan || resultadoPlan === "LIMITE_ALCANZADO") {
+    // Si el RPC nos devolvió 'pro' antes de fallar por límite, damos el mensaje PRO
     const mensaje =
-      profile.plan?.toUpperCase() === "PRO"
+      resultadoPlan === "pro"
         ? "Has agotado tus 100 créditos mensuales del Plan PRO."
         : "Has agotado tus créditos gratuitos. Suscríbete al Plan PRO para obtener 100 más.";
 
-    throw createError({ statusCode: 403, statusMessage: mensaje });
+    throw createError({
+      statusCode: 403,
+      statusMessage: mensaje,
+    });
   }
 
   // 5. LLAMADA A GROQ
@@ -113,12 +112,6 @@ Salida: {
     if (!content) throw new Error("La IA no respondió correctamente");
 
     const cleanJson = JSON.parse(content);
-
-    // 6. ACTUALIZAR CONTADOR (Importante: hacerlo DESPUÉS de que la IA responda con éxito)
-    await supabaseAdmin
-      .from("profiles")
-      .update({ requests_used: profile.requests_used + 1 })
-      .eq("id", user.id);
 
     return cleanJson;
   } catch (error: any) {
