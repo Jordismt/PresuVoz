@@ -240,6 +240,25 @@ const oficiosLinksII = [
 
         <!-- PASOS -->
         <section class="py-20 bg-slate-50 rounded-[3rem] my-8">
+          <div class="flex justify-center mb-16 px-6">
+            <button
+              @click="emit('ir-registro')"
+              class="group relative w-full max-w-md sm:w-auto px-10 py-6 bg-slate-900 text-white rounded-3xl font-black text-xl sm:text-2xl shadow-[0_20px_50px_rgba(79,70,229,0.3)] hover:shadow-[0_20px_50px_rgba(79,70,229,0.6)] hover:bg-indigo-600 transition-all duration-300 active:scale-95 overflow-hidden border-b-4 border-indigo-900 active:border-b-0">
+              <div
+                class="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+              <span class="relative z-10 flex items-center justify-center gap-3">
+                Empezar Gratis 🚀
+                <span
+                  class="text-sm font-bold bg-white/20 px-2 py-1 rounded-lg uppercase tracking-widest text-xs"
+                  >3 Presupuestos</span
+                >
+              </span>
+
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+            </button>
+          </div>
           <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
               <h2 class="text-4xl font-black text-slate-900 tracking-tighter mb-4 uppercase">
@@ -297,13 +316,6 @@ const oficiosLinksII = [
 
         <!-- CTA + Avatares -->
         <div class="flex flex-col items-center gap-8 sm:gap-10">
-          <button
-            @click="emit('ir-registro')"
-            class="group relative w-full sm:w-auto px-8 sm:px-16 py-6 sm:py-8 bg-black text-white rounded-2xl sm:rounded-3xl font-black text-xl sm:text-2xl shadow-2xl hover:bg-indigo-600 transition-all active:scale-95 overflow-hidden">
-            <span class="relative z-10">Empezar PresuVoz Gratis 🚀</span>
-            <div
-              class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-          </button>
           <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
             <div class="flex -space-x-3">
               <img
