@@ -63,15 +63,24 @@ export function useGrabacion(transcripcion: Ref<string>) {
 
         cargandoIA.value = true;
         try {
+          // 1. Miramos si hay sesión real
           const {
             data: { session },
           } = await supabase.auth.getSession();
+          const tieneToken = session?.access_token && session.access_token.length > 50;
+
           const formData = new FormData();
           formData.append("audio", audioBlob, finalMime.includes("mp4") ? "audio.mp4" : "audio.webm");
 
-          const res = await fetch("/api/transcribir", {
+          // 2. Elegimos la ruta: si no hay token, a la de invitado
+          const endpoint = tieneToken ? "/api/transcribir" : "/api/transcribir-invitado";
+
+          const res = await fetch(endpoint, {
             method: "POST",
-            headers: { Authorization: `Bearer ${session?.access_token}` },
+            headers: {
+              // SOLO enviamos el header si el token es de verdad
+              ...(tieneToken ? { Authorization: `Bearer ${session.access_token}` } : {}),
+            },
             body: formData,
           });
 
@@ -81,8 +90,12 @@ export function useGrabacion(transcripcion: Ref<string>) {
           }
 
           const { texto } = await res.json();
-          if (texto) transcripcion.value += texto + " ";
+          if (texto) {
+            // Unimos el texto nuevo a lo que ya hubiera
+            transcripcion.value += (transcripcion.value ? " " : "") + texto.trim() + ". ";
+          }
         } catch (e: any) {
+          console.error("Fallo en transcripción:", e);
           alert("❌ Error transcribiendo: " + e.message);
         } finally {
           cargandoIA.value = false;
