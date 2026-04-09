@@ -14,6 +14,13 @@ const profile = ref<any>(null);
 const mostrarLanding = ref(true);
 const mostrarRecargaMovil = ref(false);
 
+const modoInvitado = ref(false);
+
+const entrarComoInvitado = () => {
+  modoInvitado.value = true;
+  mostrarLanding.value = false;
+};
+
 // ── Composables ────────────────────────────────────────────────────────────
 const { configEmpresa, verConfig, cargarConfig, guardarConfig, subirLogo, eliminarLogo } = useConfig();
 
@@ -48,9 +55,18 @@ const fetchProfile = async () => {
 };
 
 const logout = async () => {
-  await supabase.auth.signOut();
+  // 1. Si hay un usuario real, cerramos sesión en Supabase
+  if (user.value) {
+    await supabase.auth.signOut();
+  }
+
+  // 2. Limpiamos TODOS los estados de la App
   presupuesto.value = null;
   profile.value = null;
+  transcripcion.value = ""; // Limpiamos lo que haya escrito
+
+  // 3. Reseteamos los modos de visualización
+  modoInvitado.value = false; // <-- Esto es lo que te faltaba
   mostrarLanding.value = true;
 };
 
@@ -119,11 +135,12 @@ const irAPaginaDePago = () => {
     </div>
 
     <!-- Usuario NO autenticado -->
-    <template v-else-if="!user">
+    <template v-else-if="!user && !modoInvitado">
       <LandingPage
         v-if="mostrarLanding"
         @ir-registro="mostrarLanding = false"
-        @ir-login="mostrarLanding = false" />
+        @ir-login="mostrarLanding = false"
+        @probar-invitado="entrarComoInvitado" />
 
       <AuthForm v-else @volver-landing="mostrarLanding = true" @authenticated="mostrarLanding = false" />
     </template>
@@ -147,10 +164,15 @@ const irAPaginaDePago = () => {
             :textoEnVivo="textoEnVivo"
             :cargandoIA="cargandoIA"
             :profile="profile"
+            :es-invitado="modoInvitado"
             @update:transcripcion="transcripcion = $event"
             @toggle-grabacion="toggleGrabacion"
             @generar="handleGenerar"
-            @limpiar="limpiarTranscripcion" />
+            @limpiar="limpiarTranscripcion"
+            @necesita-registro="
+              modoInvitado = false;
+              mostrarLanding = false;
+            " />
 
           <RecargaPanel
             :profile="profile"

@@ -5,6 +5,7 @@ defineProps<{
   textoEnVivo: string;
   cargandoIA: boolean;
   profile: any;
+  esInvitado: boolean; // <--- AÑADE ESTO
 }>();
 
 const emit = defineEmits<{
@@ -12,7 +13,17 @@ const emit = defineEmits<{
   "toggle-grabacion": [];
   generar: [];
   limpiar: [];
+  "necesita-registro": []; // <--- AÑADE ESTO
 }>();
+
+// Función auxiliar para manejar el clic
+const manejarClickGenerar = (esInvitado: boolean) => {
+  if (esInvitado) {
+    emit("necesita-registro");
+  } else {
+    emit("generar");
+  }
+};
 </script>
 
 <template>
@@ -33,7 +44,8 @@ const emit = defineEmits<{
       <textarea
         :value="transcripcion"
         @input="emit('update:transcripcion', ($event.target as HTMLTextAreaElement).value)"
-        placeholder='Ej: "Presupuesto para Juan, instalar 4 enchufes a 50€ cada uno..."'
+        placeholder='Escribe aquí o habla 
+Ej: "Presupuesto para Juan, instalar 4 enchufes a 50€ cada uno..."'
         class="w-full min-h-[220px] bg-slate-50/50 rounded-[2rem] p-6 text-sm font-medium text-slate-600 leading-relaxed border-2 border-dashed border-slate-100 focus:border-indigo-500 focus:bg-white focus:ring-0 outline-none transition-all resize-none italic"></textarea>
 
       <div
@@ -70,15 +82,21 @@ const emit = defineEmits<{
       </button>
 
       <button
-        @click="emit('generar')"
-        :disabled="cargandoIA || !transcripcion || profile?.requests_used >= profile?.requests_limit"
-        :class="
-          profile?.requests_used >= profile?.requests_limit
-            ? 'bg-slate-300'
-            : 'bg-slate-900 hover:bg-black active:scale-[0.98]'
+        @click="manejarClickGenerar(esInvitado)"
+        :disabled="
+          cargandoIA || !transcripcion || (!esInvitado && profile?.requests_used >= profile?.requests_limit)
         "
+        :class="[
+          cargandoIA || !transcripcion ? 'opacity-50 cursor-not-allowed' : '',
+          !esInvitado && profile?.requests_used >= profile?.requests_limit
+            ? 'bg-slate-300'
+            : 'bg-slate-900 hover:bg-black active:scale-[0.98]',
+        ]"
         class="col-span-4 h-16 text-white rounded-2xl font-black flex items-center justify-center gap-3 transition-all shadow-xl shadow-slate-200">
-        <span v-if="!cargandoIA" class="flex items-center gap-2"> ✨ <span>Generar presupuesto</span> </span>
+        <span v-if="!cargandoIA" class="flex items-center gap-2">
+          ✨
+          <span>{{ esInvitado ? "Regístrate para generar" : "Generar presupuesto" }}</span>
+        </span>
         <span v-else class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
       </button>
     </div>

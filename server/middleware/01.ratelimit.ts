@@ -41,7 +41,7 @@ const ROUTE_RULES: Record<string, RuleConfig> = {
   "/api/stripe/checkout": { limit: 10, windowMs: 60_000 },
   "/api/stripe/portal": { limit: 10, windowMs: 60_000 },
 };
-
+const GUEST_RULE: RuleConfig = { limit: 1, windowMs: 24 * 60 * 60 * 1000 }; // 1 uso cada 24h
 const DEFAULT_RULE: RuleConfig = { limit: 60, windowMs: 60_000 };
 
 function isAllowed(key: string, rule: RuleConfig): boolean {
@@ -79,7 +79,19 @@ export default defineEventHandler((event) => {
   // Clave: combinamos ruta + identificador para no penalizar IPs compartidas (NAT, VPN)
   const identifier = authHeader ? `token:${authHeader.slice(-16)}` : `ip:${ip}`;
   const key = `${pathname}:${identifier}`;
+  // DETECCIÓN DE INVITADO
+  if (!authHeader && (pathname === "/api/generar" || pathname === "/api/transcribir")) {
+    const ip = getHeader(event, "x-forwarded-for")?.split(",")[0] || "unknown";
+    const guestKey = `guest:${pathname}:${ip}`;
 
+    if (!isAllowed(guestKey, GUEST_RULE)) {
+      throw createError({
+        statusCode: 429,
+        statusMessage: "Ya has usado tu prueba gratuita por hoy. ¡Regístrate para continuar!",
+      });
+    }
+    return;
+  }
   if (!isAllowed(key, rule)) {
     const retryAfter = Math.ceil(rule.windowMs / 1000);
     // Añadimos el header estándar Retry-After

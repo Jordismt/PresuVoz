@@ -2,6 +2,7 @@
 const emit = defineEmits<{
   "ir-registro": [];
   "ir-login": [];
+  "probar-invitado": []; // <--- AÑADE ESTO
 }>();
 
 const faqs = [
@@ -174,12 +175,12 @@ const oficiosLinksII = [
           <button
             @click="emit('ir-login')"
             class="hidden sm:block text-sm font-bold text-slate-500 hover:text-black transition-colors">
-            Entrar
+            Iniciar Sesion
           </button>
           <button
-            @click="emit('ir-registro')"
-            class="px-4 sm:px-8 py-2.5 sm:py-3 bg-black text-white rounded-full text-xs sm:text-sm font-black hover:bg-indigo-600 transition-all shadow-xl active:scale-95">
-            Empezar Gratis
+            @click="emit('probar-invitado')"
+            class="px-5 sm:px-8 py-2.5 sm:py-3 bg-slate-900 text-white rounded-full text-xs sm:text-sm font-black hover:bg-indigo-600 transition-all shadow-xl active:scale-95">
+            Probar Gratis ✨
           </button>
         </div>
       </div>
@@ -242,16 +243,16 @@ const oficiosLinksII = [
         <section class="py-20 bg-slate-50 rounded-[3rem] my-8">
           <div class="flex justify-center mb-16 px-6">
             <button
-              @click="emit('ir-registro')"
+              @click="emit('probar-invitado')"
               class="group relative w-full max-w-md sm:w-auto px-10 py-6 bg-slate-900 text-white rounded-3xl font-black text-xl sm:text-2xl shadow-[0_20px_50px_rgba(79,70,229,0.3)] hover:shadow-[0_20px_50px_rgba(79,70,229,0.6)] hover:bg-indigo-600 transition-all duration-300 active:scale-95 overflow-hidden border-b-4 border-indigo-900 active:border-b-0">
               <div
                 class="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
               <span class="relative z-10 flex items-center justify-center gap-3">
-                Empezar Gratis 🚀
+                Probar ahora Gratis ✨
                 <span
-                  class="text-sm font-bold bg-white/20 px-2 py-1 rounded-lg uppercase tracking-widest text-xs"
-                  >3 Presupuestos</span
+                  class="text-sm font-bold bg-white/20 px-2 py-1 rounded-lg uppercase tracking-widest text-[10px]"
+                  >Sin Registro</span
                 >
               </span>
 

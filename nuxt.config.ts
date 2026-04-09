@@ -37,6 +37,10 @@ export default defineNuxtConfig({
     routeRules: {
       "/**": {
         headers: {
+          // Esto permite que Stripe funcione Y que tu propia web no se bloquee a sí misma
+          "Content-Security-Policy": "frame-src 'self' https://js.stripe.com https://hooks.stripe.com;",
+          // Elimina el 'DENY' si lo tenías, cámbialo por 'SAMEORIGIN'
+          "X-Frame-Options": "SAMEORIGIN",
           "Permissions-Policy": "microphone=(self)",
         },
       },
