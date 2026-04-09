@@ -38,47 +38,57 @@ export function usePresupuesto(configEmpresa: Ref<ConfigEmpresa>) {
   const generarConIA = async (onSuccess?: () => void) => {
     if (!transcripcion.value) return;
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    // 1. Obtenemos la sesión de forma segura
+    const { data } = await supabase.auth.getSession();
+    const session = data?.session;
 
-    // 1. Bloqueo de seguridad (Doble check)
-    if (!session && yaUsoPrueba.value) {
-      alert("⚠️ Has agotado tu prueba. ¡Regístrate para continuar!");
+    // 2. IMPORTANTE: Validación real del token para el móvil
+    // Comprobamos que el token existe y tiene una longitud lógica
+    const tieneTokenReal = session?.access_token && session.access_token.length > 50;
+
+    // 3. Bloqueo de seguridad para invitados
+    if (!tieneTokenReal && yaUsoPrueba.value) {
+      alert("⚠️ Has agotado tu prueba gratuita. ¡Regístrate para continuar!");
       return;
     }
 
     cargandoIA.value = true;
     try {
-      const endpoint = session ? "/api/generar" : "/api/generar-invitado";
+      // Si el token no es real, forzamos la ruta de invitado
+      const endpoint = tieneTokenReal ? "/api/generar" : "/api/generar-invitado";
 
       const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(session && { Authorization: `Bearer ${session.access_token}` }),
+          // SOLO enviamos el header si el token es 100% válido
+          ...(tieneTokenReal ? { Authorization: `Bearer ${session.access_token}` } : {}),
         },
         body: JSON.stringify({ texto: transcripcion.value }),
       });
 
       if (!res.ok) {
-        const errData = await res.json();
+        // Si el servidor da error, intentamos leer el mensaje
+        const errData = await res.json().catch(() => ({}));
         throw new Error(errData.statusMessage || "Error en la IA");
       }
 
-      presupuesto.value = await res.json();
+      const resultado = await res.json();
+      presupuesto.value = resultado;
       idPresupuestoSeleccionado.value = null;
 
-      if (session?.user?.id) {
+      // 4. Si es usuario real, guardamos en base de datos
+      if (tieneTokenReal && session?.user?.id) {
         await guardarEnDB(session.user.id);
       } else {
-        // 2. Éxito: Marcamos uso y bloqueamos para la próxima
+        // Si es invitado, marcamos la prueba como usada
         localStorage.setItem("presuvoz_demo_usada", "true");
         yaUsoPrueba.value = true;
       }
 
       onSuccess?.();
     } catch (e: any) {
+      console.error("Error en generarConIA:", e);
       alert("❌ " + e.message);
     } finally {
       cargandoIA.value = false;
