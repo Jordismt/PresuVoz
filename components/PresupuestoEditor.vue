@@ -7,6 +7,7 @@ const props = defineProps<{
   configEmpresa: ConfigEmpresa;
   calculos: Calculos;
   formatCurrency: (v: number) => string;
+  esInvitado: boolean; // <--- AÑADE ESTO
 }>();
 
 const emit = defineEmits<{
@@ -14,6 +15,7 @@ const emit = defineEmits<{
   "añadir-fila": [];
   descargar: [];
   compartir: [];
+  "necesita-registro": []; // <--- AÑADE ESTO
 }>();
 
 // Directiva para auto-resize de textarea
@@ -136,14 +138,17 @@ const vAutoResize = {
       <!-- Botones PDF -->
       <div class="flex flex-col md:flex-row gap-4 mt-12">
         <button
-          @click="emit('descargar')"
+          @click="esInvitado ? emit('necesita-registro') : emit('descargar')"
           class="flex-1 bg-slate-100 text-slate-600 p-6 rounded-3xl font-black text-lg hover:bg-slate-200 transition-all flex items-center justify-center gap-3">
-          <span>📥</span> Descargar
+          <span>📥</span>
+          <span>{{ esInvitado ? "Regístrate para bajar PDF" : "Descargar" }}</span>
         </button>
+
         <button
-          @click="emit('compartir')"
+          @click="esInvitado ? emit('necesita-registro') : emit('compartir')"
           class="flex-[2] bg-indigo-600 text-white p-6 rounded-3xl font-black text-lg shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-          <span>🚀</span> Generar y Enviar
+          <span>🚀</span>
+          <span>{{ esInvitado ? "Regístrate para Enviar" : "Generar y Enviar" }}</span>
         </button>
       </div>
     </div>

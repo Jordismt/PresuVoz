@@ -16,9 +16,33 @@ const mostrarRecargaMovil = ref(false);
 
 const modoInvitado = ref(false);
 
+// index.vue
 const entrarComoInvitado = () => {
   modoInvitado.value = true;
   mostrarLanding.value = false;
+
+  // Creamos un ejemplo real de un gremio (ej. Electricista)
+  presupuesto.value = {
+    cliente: "CLIENTE DE PRUEBA",
+    items: [
+      { 
+        desc: "Instalación de cuadro eléctrico según normativa vigente (CGE)", 
+        cant: 1, 
+        precio: 450 
+      },
+      { 
+        desc: "Punto de luz adicional con canalización de superficie", 
+        cant: 4, 
+        precio: 65 
+      },
+      { 
+        desc: "Desplazamiento técnico y puesta en marcha", 
+        cant: 1, 
+        precio: 35 
+      }
+    ],
+    moneda: "EUR"
+  };
 };
 
 // ── Composables ────────────────────────────────────────────────────────────
@@ -192,6 +216,11 @@ const irAPaginaDePago = () => {
             :formatCurrency="formatCurrency"
             @eliminar-fila="eliminarFila"
             @añadir-fila="añadirFila"
+            :es-invitado="modoInvitado"
+            @necesita-registro="
+              modoInvitado = false;
+              mostrarLanding = false;
+            "
             @descargar="handleDescargar"
             @compartir="handleCompartir" />
 

@@ -157,30 +157,37 @@ const oficiosLinksII = [
     </component>
 
     <!-- NAV -->
-    <nav class="fixed top-0 z-[100] w-full bg-white/80 backdrop-blur-xl border-b border-slate-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex justify-between items-center">
+    <nav class="fixed top-0 z-[100] w-full bg-white/90 backdrop-blur-md border-b border-slate-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex justify-between items-center">
         <div
-          class="flex items-center gap-2 sm:gap-3 group cursor-pointer"
+          class="flex items-center gap-2 group cursor-pointer"
           @click="window.scrollTo({ top: 0, behavior: 'smooth' })">
           <div class="relative shrink-0 transform -rotate-3 transition-transform hover:rotate-0 duration-300">
-            <div class="absolute inset-0 bg-indigo-200 rounded-2xl blur-lg opacity-40 scale-90"></div>
+            <div class="absolute inset-0 bg-indigo-200 rounded-xl blur-lg opacity-40 scale-90"></div>
             <img
               src="/logo.png"
-              alt="Logo PresuVoz"
-              class="relative w-12 h-12 object-contain bg-white rounded-2xl p-1.5 shadow-lg border border-slate-100" />
+              alt="Logo"
+              class="relative w-10 h-10 sm:w-12 sm:h-12 object-contain bg-white rounded-xl p-1 shadow-md border border-slate-50" />
           </div>
-          <span class="text-xl sm:text-2xl font-black tracking-tighter uppercase italic">PresuVoz</span>
+          <span class="text-lg sm:text-2xl font-black tracking-tighter uppercase italic">PresuVoz</span>
         </div>
-        <div class="flex items-center gap-3 sm:gap-8">
+
+        <div class="flex items-center gap-2 sm:gap-6">
           <button
             @click="emit('ir-login')"
-            class="hidden sm:block text-sm font-bold text-slate-500 hover:text-black transition-colors">
-            Iniciar Sesion
+            class="px-3 sm:px-5 py-2 sm:py-3 text-[10px] sm:text-sm font-extrabold text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all uppercase tracking-tight">
+            Iniciar Sesión
           </button>
+
           <button
             @click="emit('probar-invitado')"
-            class="px-5 sm:px-8 py-2.5 sm:py-3 bg-slate-900 text-white rounded-full text-xs sm:text-sm font-black hover:bg-indigo-600 transition-all shadow-xl active:scale-95">
-            Probar Gratis ✨
+            class="relative group px-4 sm:px-8 py-2.5 sm:py-3.5 bg-indigo-600 text-white rounded-xl sm:rounded-2xl text-[10px] sm:text-sm font-black transition-all shadow-[0_10px_20px_-5px_rgba(79,70,229,0.3)] hover:shadow-indigo-200 active:scale-95 overflow-hidden">
+            <div
+              class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+
+            <span class="relative flex items-center gap-1.5 sm:gap-2 uppercase tracking-wide">
+              Probar <span class="hidden xs:inline">Gratis</span> ✨
+            </span>
           </button>
         </div>
       </div>

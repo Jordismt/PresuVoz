@@ -70,14 +70,14 @@ Ej: "Presupuesto para Juan, instalar 4 enchufes a 50€ cada uno..."'
 
     <div class="grid grid-cols-5 gap-3 mt-6">
       <button
-        @click="emit('toggle-grabacion')"
-        :class="
+        @click="esInvitado ? emit('necesita-registro') : emit('toggle-grabacion')"
+        :class="[
           grabando
             ? 'bg-red-500 shadow-red-200 ring-4 ring-red-50 text-white'
-            : 'bg-slate-100 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600'
-        "
-        class="col-span-1 h-16 rounded-2xl flex items-center justify-center transition-all active:scale-95"
-        title="Dictar por voz">
+            : 'bg-slate-100 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600',
+          esInvitado ? 'border-2 border-indigo-200' : '',
+        ]"
+        class="col-span-1 h-16 rounded-2xl flex items-center justify-center transition-all active:scale-95">
         <span class="text-2xl">{{ grabando ? "⏹" : "🎙️" }}</span>
       </button>
 
