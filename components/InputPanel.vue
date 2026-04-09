@@ -1,11 +1,11 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   transcripcion: string;
   grabando: boolean;
   textoEnVivo: string;
   cargandoIA: boolean;
   profile: any;
-  esInvitado: boolean; // <--- AÑADE ESTO
+  esInvitado: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -13,16 +13,18 @@ const emit = defineEmits<{
   "toggle-grabacion": [];
   generar: [];
   limpiar: [];
-  "necesita-registro": []; // <--- AÑADE ESTO
+  "necesita-registro": [];
 }>();
 
-// Función auxiliar para manejar el clic
-const manejarClickGenerar = (esInvitado: boolean) => {
-  if (esInvitado) {
-    emit("necesita-registro");
-  } else {
-    emit("generar");
-  }
+// MODIFICACIÓN: Ahora permitimos que el invitado emita 'generar'
+const manejarClickGenerar = () => {
+  emit("generar");
+};
+
+// El micrófono sí puedes decidir si dejarlo o pedir registro
+// (yo lo dejaría abierto para que vean la magia completa)
+const manejarClickMicro = () => {
+  emit("toggle-grabacion");
 };
 </script>
 
@@ -70,19 +72,18 @@ Ej: "Presupuesto para Juan, instalar 4 enchufes a 50€ cada uno..."'
 
     <div class="grid grid-cols-5 gap-3 mt-6">
       <button
-        @click="esInvitado ? emit('necesita-registro') : emit('toggle-grabacion')"
+        @click="manejarClickMicro"
         :class="[
           grabando
             ? 'bg-red-500 shadow-red-200 ring-4 ring-red-50 text-white'
             : 'bg-slate-100 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600',
-          esInvitado ? 'border-2 border-indigo-200' : '',
         ]"
         class="col-span-1 h-16 rounded-2xl flex items-center justify-center transition-all active:scale-95">
         <span class="text-2xl">{{ grabando ? "⏹" : "🎙️" }}</span>
       </button>
 
       <button
-        @click="manejarClickGenerar(esInvitado)"
+        @click="manejarClickGenerar"
         :disabled="
           cargandoIA || !transcripcion || (!esInvitado && profile?.requests_used >= profile?.requests_limit)
         "
@@ -95,14 +96,20 @@ Ej: "Presupuesto para Juan, instalar 4 enchufes a 50€ cada uno..."'
         class="col-span-4 h-16 text-white rounded-2xl font-black flex items-center justify-center gap-3 transition-all shadow-xl shadow-slate-200">
         <span v-if="!cargandoIA" class="flex items-center gap-2">
           ✨
-          <span>{{ esInvitado ? "Regístrate para generar" : "Generar presupuesto" }}</span>
+          <span>{{ esInvitado ? "Generar Presupuesto Gratis" : "Generar presupuesto" }}</span>
         </span>
         <span v-else class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
       </button>
     </div>
 
     <p
-      v-if="profile?.requests_used >= profile?.requests_limit"
+      v-if="esInvitado"
+      class="text-center text-[10px] text-indigo-500 font-bold mt-4 uppercase tracking-[0.1em]">
+      🚀 Estás en modo prueba: ¡Crea tu primer presupuesto!
+    </p>
+
+    <p
+      v-if="!esInvitado && profile?.requests_used >= profile?.requests_limit"
       class="text-center text-[10px] text-red-500 font-bold mt-4 uppercase tracking-tighter">
       ⚠️ Créditos agotados. Recarga para continuar.
     </p>

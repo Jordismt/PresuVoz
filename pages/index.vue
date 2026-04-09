@@ -50,6 +50,7 @@ const { configEmpresa, verConfig, cargarConfig, guardarConfig, subirLogo, elimin
 
 const {
   presupuesto,
+  yaUsoPrueba,
   listaPresupuestos,
   idPresupuestoSeleccionado,
   transcripcion,
@@ -194,8 +195,13 @@ const irAPaginaDePago = () => {
             :cargandoIA="cargandoIA"
             :profile="profile"
             :es-invitado="modoInvitado"
+            :bloqueado-invitado="yaUsoPrueba && modoInvitado"
             @update:transcripcion="transcripcion = $event"
-            @toggle-grabacion="toggleGrabacion"
+            @toggle-grabacion="
+              yaUsoPrueba && modoInvitado
+                ? ((modoInvitado = false), (mostrarLanding = false))
+                : toggleGrabacion()
+            "
             @generar="handleGenerar"
             @limpiar="limpiarTranscripcion"
             @necesita-registro="
@@ -246,6 +252,7 @@ const irAPaginaDePago = () => {
           </div>
 
           <HistorialPresupuestos
+            v-if="!modoInvitado"
             :listaPresupuestos="listaPresupuestos"
             :idPresupuestoSeleccionado="idPresupuestoSeleccionado"
             :formatCurrency="formatCurrency"

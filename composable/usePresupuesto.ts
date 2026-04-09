@@ -9,14 +9,18 @@ export function usePresupuesto(configEmpresa: Ref<ConfigEmpresa>) {
   const idPresupuestoSeleccionado = ref<string | null>(null);
   const transcripcion = ref("");
   const cargandoIA = ref(false);
-
+  const yaUsoPrueba = ref(false);
   const calculos = computed(() => {
     if (!presupuesto.value) return { subtotal: 0, iva: 0, total: 0 };
     const subtotal = presupuesto.value.items.reduce((acc, i) => acc + i.cant * i.precio, 0);
     const iva = subtotal * (configEmpresa.value.ivaPorcentaje / 100);
     return { subtotal, iva, total: subtotal + iva };
   });
-
+  onMounted(() => {
+    if (process.client) {
+      yaUsoPrueba.value = localStorage.getItem("presuvoz_demo_usada") === "true";
+    }
+  });
   const cargarHistorial = async (userId: string) => {
     const { data, error } = await supabase
       .from("presupuestos")
@@ -33,23 +37,46 @@ export function usePresupuesto(configEmpresa: Ref<ConfigEmpresa>) {
 
   const generarConIA = async (onSuccess?: () => void) => {
     if (!transcripcion.value) return;
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    // 1. Bloqueo de seguridad (Doble check)
+    if (!session && yaUsoPrueba.value) {
+      alert("⚠️ Has agotado tu prueba. ¡Regístrate para continuar!");
+      return;
+    }
+
     cargandoIA.value = true;
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const res = await fetch("/api/generar", {
+      const endpoint = session ? "/api/generar" : "/api/generar-invitado";
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
+          ...(session && { Authorization: `Bearer ${session.access_token}` }),
         },
         body: JSON.stringify({ texto: transcripcion.value }),
       });
-      if (!res.ok) throw new Error((await res.json()).statusMessage || "Error");
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.statusMessage || "Error en la IA");
+      }
+
       presupuesto.value = await res.json();
       idPresupuestoSeleccionado.value = null;
-      await guardarEnDB(session?.user?.id);
+
+      if (session?.user?.id) {
+        await guardarEnDB(session.user.id);
+      } else {
+        // 2. Éxito: Marcamos uso y bloqueamos para la próxima
+        localStorage.setItem("presuvoz_demo_usada", "true");
+        yaUsoPrueba.value = true;
+      }
+
       onSuccess?.();
     } catch (e: any) {
       alert("❌ " + e.message);
@@ -138,6 +165,7 @@ export function usePresupuesto(configEmpresa: Ref<ConfigEmpresa>) {
     transcripcion,
     cargandoIA,
     calculos,
+    yaUsoPrueba,
     cargarHistorial,
     generarConIA,
     guardarEnDB,
