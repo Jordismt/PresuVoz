@@ -3,11 +3,13 @@ defineProps<{
   user: any;
   profile: any;
   mostrarRecargaMovil: boolean;
+  esInvitado?: boolean;
 }>();
 
 const emit = defineEmits<{
   "update:mostrarRecargaMovil": [value: boolean];
   "abrir-config": [];
+  "necesita-registro": [];
   logout: [];
 }>();
 </script>
@@ -46,6 +48,25 @@ const emit = defineEmits<{
     <div
       class="flex flex-wrap items-center justify-between md:justify-end gap-3 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 border-slate-100">
       <!-- Créditos disponibles -->
+      <div v-if="esInvitado" class="relative">
+        <button
+          @click="emit('necesita-registro')"
+          class="group relative z-30 flex items-center bg-indigo-600 text-white rounded-2xl shadow-xl shadow-indigo-200 hover:shadow-indigo-400/40 active:scale-95 transition-all overflow-hidden border-2 border-white">
+          <div class="flex items-center gap-2 px-4 py-2.5 bg-white/10 border-r border-white/20">
+            <span class="text-sm group-hover:scale-125 transition-transform">🎁</span>
+            <p class="text-[11px] font-black uppercase tracking-widest leading-none">
+              ¡3 Presupuestos Gratis!
+            </p>
+          </div>
+
+          <div class="px-4 py-2.5 bg-indigo-700/30">
+            <p class="text-[10px] font-black uppercase tracking-[0.15em] text-white">Regístrate ahora</p>
+          </div>
+
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_infinite] pointer-events-none"></div>
+        </button>
+      </div>
       <div v-if="profile" class="relative">
         <button
           @click="emit('update:mostrarRecargaMovil', !mostrarRecargaMovil)"

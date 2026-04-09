@@ -30,6 +30,10 @@ const faqs = [
     q: "¿Cómo funciona el primer gratis?",
     a: "Simplemente regístrate y tendrás 1 crédito de regalo. Podrás dictar, generar y descargar tu primer PDF real sin pagar nada.",
   },
+  {
+    q: "¿Cómo funciona la prueba gratuita?",
+    a: "Simplemente crea tu cuenta y te regalamos 3 créditos automáticamente. Cada crédito te permite dictar, generar con IA y descargar un presupuesto profesional completo en PDF.",
+  },
 ];
 
 const stats = [
@@ -256,10 +260,10 @@ const oficiosLinksII = [
                 class="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
               <span class="relative z-10 flex items-center justify-center gap-3">
-                Probar ahora Gratis ✨
+                Probar Gratis ✨
                 <span
                   class="text-sm font-bold bg-white/20 px-2 py-1 rounded-lg uppercase tracking-widest text-[10px]"
-                  >Sin Registro</span
+                  >🎁 REGALO: 3 presupuestos GRATIS al crear tu cuenta</span
                 >
               </span>
 
@@ -325,13 +329,6 @@ const oficiosLinksII = [
         <!-- CTA + Avatares -->
         <div class="flex flex-col items-center gap-8 sm:gap-10">
           <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-            <div class="flex -space-x-3">
-              <img
-                v-for="i in 4"
-                :key="i"
-                :src="`https://i.pravatar.cc/100?img=${i + 30}`"
-                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-white shadow-lg" />
-            </div>
             <div class="text-center sm:text-left">
               <p class="text-sm font-black text-slate-900">+100 autónomos</p>
               <p class="text-xs font-bold text-slate-400 italic">Ahorran 15 horas de oficina al mes</p>

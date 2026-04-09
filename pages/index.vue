@@ -25,23 +25,23 @@ const entrarComoInvitado = () => {
   presupuesto.value = {
     cliente: "CLIENTE DE PRUEBA",
     items: [
-      { 
-        desc: "Instalación de cuadro eléctrico según normativa vigente (CGE)", 
-        cant: 1, 
-        precio: 450 
+      {
+        desc: "Instalación de cuadro eléctrico según normativa vigente (CGE)",
+        cant: 1,
+        precio: 450,
       },
-      { 
-        desc: "Punto de luz adicional con canalización de superficie", 
-        cant: 4, 
-        precio: 65 
+      {
+        desc: "Punto de luz adicional con canalización de superficie",
+        cant: 4,
+        precio: 65,
       },
-      { 
-        desc: "Desplazamiento técnico y puesta en marcha", 
-        cant: 1, 
-        precio: 35 
-      }
+      {
+        desc: "Desplazamiento técnico y puesta en marcha",
+        cant: 1,
+        precio: 35,
+      },
     ],
-    moneda: "EUR"
+    moneda: "EUR",
   };
 };
 
@@ -175,8 +175,13 @@ const irAPaginaDePago = () => {
         :user="user"
         :profile="profile"
         :mostrarRecargaMovil="mostrarRecargaMovil"
+        :es-invitado="modoInvitado"
         @update:mostrarRecargaMovil="mostrarRecargaMovil = $event"
         @abrir-config="verConfig = true"
+        @necesita-registro="
+          modoInvitado = false;
+          mostrarLanding = false;
+        "
         @logout="logout" />
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">

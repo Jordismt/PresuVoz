@@ -106,7 +106,7 @@ const handleAuth = async () => {
           <p class="mt-2 text-slate-500 font-medium text-sm md:text-base">
             {{
               esRegistro
-                ? "🎁 Pruebalo GRATIS • Guarda tus trabajos • 📲Envía por WhatsApp • Copia y edita presupuestos antiguos GRATIS y sin límites."
+                ? "🎁 Te regalamos tus 3 primeros presupuestos al registrarte. Sin tarjetas. Prueba el dictado por voz y genera tus PDF profesionales al instante."
                 : "Entra para gestionar tus presupuestos y clientes."
             }}
           </p>
