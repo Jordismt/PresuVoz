@@ -105,7 +105,7 @@ Ej: "Presupuesto para Juan, instalar 4 enchufes a 50€ cada uno..."'
     <p
       v-if="esInvitado"
       class="text-center text-[10px] text-indigo-500 font-bold mt-4 uppercase tracking-[0.1em]">
-      🚀 Estás en modo prueba: ¡Crea tu primer presupuesto!
+      🚀 Estás en modo prueba: ¡Crea tu primer presupuesto real al Registrarte !!!
     </p>
 
     <p
